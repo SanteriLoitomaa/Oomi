@@ -1,0 +1,41 @@
+%% LyX 2.3.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[language=finnish]{utuftlabreport}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage[xetex]{graphicx}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\DeclareTextSymbolDefault{\textquotedbl}{T1}
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\makeatother
+
+\usepackage[style=ieee]{biblatex}
+\addbibresource{Bibliografia.bib}
+\begin{document}
+
+\publab{Tietotekniikka}{Software engineering}
+
+\pubcourse{Olio-ohjelmoinnin metodiikka}
+
+\groupmembers{Mikko Mallikas (123456), Maija Meik\"{a}l\"{a}inen (987654)}
+
+\title{Viikkoharjoitusty\"{o} 1}
+
+\maketitle
+\input{teht1.tex}\input{teht2.tex}
+
+\printbibliography
+% don't include this if appendices are not present
+\appendices 
+
+\appchapter{Liitedokumentti}
+
+T\"{a}ss\"{a} esimerkki\pagebreak{}
+
+kaksisivuisesta liitteest\"{a}.
+\end{document}

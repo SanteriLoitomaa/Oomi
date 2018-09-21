@@ -1,0 +1,77 @@
+
+\chapter{Tehtävä 1 \label{chap:Teht=0000E4v=0000E4-1}}
+
+Viittaaminen lukuun \ref{chap:Teht=0000E4v=0000E4-1}, toiseen lukuun
+\ref{chap:Teht=0000E4v=0000E4-2}, alilukuun \ref{Alaotsikko}, tätä
+alempaan lukuun \ref{Alempiotsikko}, alimpaan lukuun \ref{Alinotsikko},
+kuvaan \ref{Kuva esimerkki} ja tauluun \ref{Tauluesimerkki}.
+
+Kuva liitetään seuraavasti. ShareLaTeXin autocomplete rakentaa
+koko begin-end blockin yleensä puolestasi.
+
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/turun-yliopisto}
+\caption{Kuvan otsikko}
+\label{Kuva esimerkki} 
+\end{figure}
+
+Taulukkoja tehdään seuraavasti.
+
+\begin{table}
+\begin{centering}
+\caption{Taulukon otsikko tulee taulun yläpuolelle}
+\begin{tabular}{l|c|r|}
+Taulun  & elementit  & erotetaan \tabularnewline
+\hline 
+toisistaan  & et-merkillä  & \tabularnewline
+soluja voi myös  &  & jättää tyhjäksi \tabularnewline
+\end{tabular}
+\par\end{centering}
+\centering{}\label{Tauluesimerkki}
+\end{table}
+
+Kirjallisuusviitteet lisätään bib-muodossa bibliografia
+tiedostoon ja niihin viitataan niiden ID:llä, joka on bib-muodon
+ensimmäinen kenttä \cite{crawley2007write}.
+
+\section{Alaotsikko}
+
+\label{Alaotsikko}
+
+Esimerkki viittaamisesta, jossa myös cite komennon tagi löytyy
+Bibliografia.bib tiedostosta \cite{puasuareanu2009survey}.
+
+\subsection{Alempiotsikko}
+
+\label{Alempiotsikko}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget
+tellus porttitor, tempus lacus non, pellentesque ligula. Donec sit
+amet erat condimentum, feugiat mi accumsan, euismod quam.
+
+Mauris laoreet maximus aliquet. Mauris at gravida elit. Ut nec lobortis
+elit. Sed lacinia nisi in ex sollicitudin, ac consequat lacus imperdiet.
+Etiam et velit eu lacus maximus faucibus.
+
+\subsubsection{Alinotsikko, joka ei näy sisällysluettelossa}
+
+\label{Alinotsikko}
+\begin{javacode}
+// java-koodin voi kirjoittaa tallaiseen ymparistoon
+// jolloin koodi syntaksivarjataan automaattisesti
+// lyx ei tue tassa skandeja, mutta puhdas (xe)latex tukee
+public class HelloWorld {
+  public static void main(String[] args) {
+    // Prints "Hello, World" to the terminal window.
+    System.out.println("Hello, World");
+  }
+}
+\end{javacode}
+
+\paragraph{Otsikko tekstissä, joka ei näy sisällysluettelossa}
+
+Mauris laoreet maximus aliquet. Mauris at gravida elit. Ut nec lobortis
+elit. Sed lacinia nisi in ex sollicitudin, ac consequat lacus imperdiet.
+Etiam et velit eu lacus maximus faucibus. Vestibulum ante ipsum primis
+in faucibus orci luctus et ultrices posuere cubilia Curae; Donec vulputate
+tellus ullamcorper odio sodales, non scelerisque neque eleifend. 
