@@ -1,0 +1,284 @@
+
+\chapter{Tehtävä 4 \label{chap:Teht=0000E4v=0000E4-1}}
+
+Tehtävän tarkoituksena oli muodostaa oliorakenne, joka kuvaa Tetris-pelin
+palasia. Tetris-palasen kuvaus on jaettu kahteen luokkaan: Piece, joka kuvaa
+yhtä mielivaltaisen muotoista kappaletta – Shape, joka kuvaa Tetriksessä
+käytettävien kappaleiden muotoja. Luokkatoteutus tehtiin seuraavanlaisella
+java-koodilla:
+
+\begin{javacode}
+/**
+ * 
+ * Describes 4x4 piece in boolean values
+ * @author Pasi Toivanen
+ *
+ */
+public class Piece {
+
+	private boolean[][] grid;
+	private int gridSize;
+	
+//--Constructor (Muodostimet)
+	/**
+	 * 
+	 * @param shape
+	 */
+	public Piece(Shape shape) {
+		this.grid = shape.getGrid();
+		this.gridSize = grid.length;
+	}
+	
+	public void turnClockwise() {
+		boolean[][] oldGrid = grid;
+		grid = new boolean[gridSize][gridSize];
+		for ( int i = 0; i < gridSize; i++) {
+			for ( int j = 0; j < gridSize; j++) {
+				grid[i][j] = oldGrid[gridSize-j-1][i];
+			}
+		}
+	}
+	
+//--Getters (Havainnoijat)
+	public String toString() {
+		String result = "";
+		for ( int i = 0; i < grid.length; i++) {
+			String printRow = "";
+			for ( int j = 0; j < grid[i].length; j++) {
+				printRow += grid[i][j] ? "*" : " ";
+			}
+			result += printRow + "\n";
+		}
+		return result;
+	}
+	
+	public boolean[][] getGrid() {
+		return grid;
+	}
+
+	public int getGridSize() {
+		return gridSize;
+	}
+
+//--Setters (Muutosoperaatiot)
+	/**
+	 * TODO:gridSize changes grid and expands or shrinks it accordingly
+	 * @.pre gridSize > 0
+	 * @.post this.gridSize.equals(gridSize)
+	 * @param gridSize
+	 */
+	public void setGridSize(int gridSize) {
+		this.gridSize = gridSize;
+	}
+	
+	/**
+	 * @.pre grid[i][j] = ( true || false ) for each i,j < gridSize
+	 * @.post this.grid.equals(grid)
+	 * @param grid TODO:this could be different size than this.grid
+	 */
+	public void setGrid(boolean[][] grid) {
+		this.grid = grid;
+	}
+
+}
+
+/**
+ * 
+ * Describes a shape in 4x4 boolean grid
+ * @author Pasi Toivanen
+ *
+ */
+enum Shape {
+	SQUARE,
+	LONG,
+	PYRAMID,
+	ZIGZAG;
+	
+	public boolean[][] getGrid() {
+		boolean[][] result = new boolean[4][4];
+		switch(this) {
+			case SQUARE:
+				result[1][1] = true; //
+				result[1][2] = true; // **
+				result[2][1] = true; // **
+				result[2][2] = true; //
+				break;
+			case LONG:
+				result[0][1] = true; //
+				result[1][1] = true; //****
+				result[2][1] = true; //
+				result[3][1] = true; //
+				break;
+			case PYRAMID:
+				result[0][2] = true; //
+				result[1][2] = true; // *
+				result[2][2] = true; //***
+				result[1][1] = true; //
+				break;
+			case ZIGZAG:
+				result[0][1] = true; //
+				result[1][1] = true; //**
+				result[1][2] = true; // **
+				result[2][2] = true; //
+				break;
+		}
+		return result;
+	}
+	
+	/**
+	 * @return TODO: different gridSize for pieces smaller than 4x4
+	 */
+	public int gridSize() {
+		return 4;
+	}
+}
+\end{javacode}
+
+Luokkarakenteella voidaan vastata kaikkiin kohtiin a-d. Vastaukset käydään läpi
+seuraavissa aliluvuissa.
+
+\section{A-tehtävä}
+
+\label{A-tehtävä}
+
+Neliönmuotoinen Tetris-kappale voidaan luoda ja tulostaa seuraavasti:
+
+\begin{javacode}
+Piece square = new Piece(Shape.SQUARE);
+System.out.println(square.toString());
+//Tulostaa konsoliin:
+//
+// **
+// **
+//
+\end{javacode}
+
+Itse kappaleen datarakenteen muodostaminen tapahtuu Shape-luokassa, joka tietää
+minkä muotoinen on neliö. Shape-luokasta saatu datarakenne tallennetaan
+Piece-luokan olion muodoksi ja se voidaan tulostaa.
+
+\section{B-tehtävä}
+
+\label{B-tehtävä}
+
+Sattumanvarainen kappale voidaan luoda kirjoittamalla rivi:
+
+\begin{javacode}
+Piece random = new Piece(Shape.values()[r.nextInt(Shape.values().length)]);
+\end{javacode}
+
+jossa r on tehtävään tarvittu Random-olio.
+
+\section{C-tehtävä}
+
+\label{C-tehtävä}
+
+Kappale voidaan pyöräyttää käyttämällä Piece-olion turnCoclwise() -metodia:
+
+\begin{javacode}
+//luodaan olio
+Piece pyramid = new Piece(Shape.ZIGZAG);
+
+//tulostetaan se ennen pyöräytystä
+System.out.println(pyramid.toString());
+
+//pyöritellään neljä kertaa kappaletta
+for ( int i = 0; i < 4; i++) {
+	//Pyöräytetään 90° astetta myötäpäivään
+	pyramid.turnClockwise();
+	
+	//tulostetaan jokaisen pyörähdyksen jälkeen
+	System.out.println(pyramid.toString());
+}
+//Tuloste konsolissa:
+//
+//*  
+//** 
+// * 
+//   
+//
+//   
+// **
+//** 
+//   
+//
+//   
+//*  
+//** 
+// * 
+//
+//   
+//** 
+//**  
+//   
+//
+//*  
+//** 
+// * 
+//  
+\end{javacode}
+
+Pyöräytysmetodi käsittelee boolean arraytä tarkastelemalla jokaista indeksiä
+seuraavanlaisesti:
+
+\begin{javacode}
+	public void turnClockwise() {
+		boolean[][] oldGrid = grid;
+		grid = new boolean[gridSize][gridSize];
+		for ( int i = 0; i < gridSize; i++) {
+			for ( int j = 0; j < gridSize; j++) {
+				grid[i][j] = oldGrid[gridSize-j-1][i];
+			}
+		}
+	}
+\end{javacode}
+
+jossa jokainen kohta ruuduosta (grid) käydään ja kirjoitetaan soluun uusi oikea
+käännetty arvo.
+
+\section{D-tehtävä}
+
+\label{D-tehtävä}
+
+Testataan mitä käy kappaleelle, jos sitä pyöräytetään neljäkertaa myötäpäivään.
+JUnit5-testimetodi on rakennettu seuraavanlaisesti:
+
+\begin{javacode}
+/**
+ * Creates random shape, rotates it 4 times and checks if it creates the same string
+ */
+@RepeatedTest(value = 1000)
+void test() {
+	//d-kohta
+	Random r = new Random();
+	Shape random = Shape.values()[r.nextInt(4)];
+	
+	Piece original = new Piece(random);
+	Piece rotated = new Piece(random);
+	
+	for( int i = 0; i < 4; i++) {
+		rotated.turnClockwise();
+	}
+	
+	assertEquals(rotated.toString(), original.toString());
+}
+\end{javacode}
+
+Testin aikana muodostetaan sattumanvarainen muoto, josta rakennetaan kaksi
+identtistä kappaletta. Kappaleita pyöritetään neljäkertaa turnClockwise()
+-metodilla ja tämän jälkeen kappaleiden tulostumista verrataan.
+
+Tulokseksi saadaan 1000 kertaa toistetulla toistokokeella:
+
+\begin{javacode}
+// Runs: 1000/1000	Errors: 0	Failures:	0
+\end{javacode}
+
+joka osoittaa, että toString()-metodit palauttavat identtisen arvon, jolloin
+kappale tulostuu saman muotoisena 4 pyöräytyksen jälkeen. Voidaan olettaa, että
+silloin kappaleen grid-muuttujan data on myös identtinen pyöräytetyn kappaleen
+datan kanssa. 
+
+
+
+
