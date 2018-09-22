@@ -64,89 +64,89 @@ teksti joka kertoo lopputuloksen.
 		boolean oikein = true;
 		boolean brake = false;
 		if (o instanceof Sudoku) {
-			System.out.println("Objekti on Sudoku");
-			// tästä alkaa tarkistus onko sudoku
+		    System.out.println("Objekti on Sudoku");
+		    // tästä alkaa tarkistus onko sudoku
 			   täytetty vai kesken
-			for (int x=0; x<9; x++) {
-				for (int y=0; y<9; y++) {
-					if (((Sudoku) o).kenttä[x][y]==0) {
-						täysi = false;
-					}
-				}
-			}
-			//Tästä alkaa tarkistus onko sudoku oikein
+		    for (int x=0; x<9; x++) {
+			    for (int y=0; y<9; y++) {
+				    if (((Sudoku) o).kenttä[x][y]==0) {
+					    täysi = false;
+				    }
+			    }
+		    }
+		    //Tästä alkaa tarkistus onko sudoku oikein
 			  täytetty (vasta vaakarivit)
-			for (int luku=1;luku<10;luku++) {
-				for (int x=0; x<9; x++) {
-					int toistox = 0;
-					int toistoy = 0;
-					for (int y=0; y<9; y++) {
-						if (((Sudoku) o).kenttä[x][y]==luku) {
-							toistox ++;
-						}
-						if (((Sudoku) o).kenttä[y][x]==luku) {
-							toistoy ++;
-						}
-					}
-					if (brake){
-						break;
-					}
-					if (toistox>1 || toistoy>1) {
-						System.out.println("Sudoku on väärin
-						täytetty");
-						brake = true;
-					}
-				}
-				if (brake){
-					break;
-				}
-				for (int a=0;a<3;a++) {
-					for (int b=0;b<3;b++) {
-						int toistoz = 0;
-						for (int x=0;x<3;x++) {
-							for (int y=0;y<3;y++) {
-								if (((Sudoku) o).kenttä[x+a*3]
-								[y+b*3]==luku) {
-									toistoz ++;
-								}
-								if (toistoz>1) {
-									System.out.println("Sudoku
-									on väärin täytetty");
-									brake = true;
-								}
-								if (brake){
-									break;
-								}
-							}
-							if (brake){
-								break;
-							}
-						}
-						if (brake){
-							break;
-						}
-					}
-					if (brake){
-						break;
-					}
-				}
-				if (brake){
-					break;
-				}
-			}
-			if (brake == false) {
-				System.out.println("Sudoku on oikein
-				täytetty");
-			}
-			if (täysi) {
-				System.out.println("Sudoku on täysi");
-			}else {
-				System.out.println("Sudoku ei ole täysi");
-			}
-		}else {
-			System.out.println("Objekti ei ole Sudoku");
-		}
-	}
+		    for (int luku=1;luku<10;luku++) {
+			    for (int x=0; x<9; x++) {
+				    int toistox = 0;
+				    int toistoy = 0;
+				    for (int y=0; y<9; y++) {
+					    if (((Sudoku) o).kenttä[x][y]==luku) {
+						    toistox ++;
+					    }
+					    if (((Sudoku) o).kenttä[y][x]==luku) {
+						    toistoy ++;
+					    }
+				    }
+				    if (brake){
+					    break;
+				    }
+				    if (toistox>1 || toistoy>1) {
+					    System.out.println("Sudoku on väärin
+					    täytetty");
+					    brake = true;
+				    }
+			    }
+			    if (brake){
+				    break;
+			    }
+			    for (int a=0;a<3;a++) {
+				    for (int b=0;b<3;b++) {
+					    int toistoz = 0;
+					    for (int x=0;x<3;x++) {
+						    for (int y=0;y<3;y++) {
+							    if (((Sudoku) o).kenttä[x+a*3]
+							    [y+b*3]==luku) {
+								    toistoz ++;
+							    }
+							    if (toistoz>1) {
+								    System.out.println("Sudoku
+								    on väärin täytetty");
+								    brake = true;
+							    }
+							    if (brake){
+								    break;
+							    }
+						    }
+						    if (brake){
+							    break;
+						    }
+					     }
+					    if (brake){
+						    break;
+					    }
+				    }
+				    if (brake){
+					    break;
+				    }
+			    }
+			    if (brake){
+				    break;
+			    }
+		    }
+		    if (brake == false) {
+			    System.out.println("Sudoku on oikein
+			    täytetty");
+		    }
+		    if (täysi) {
+			    System.out.println("Sudoku on täysi");
+		    }else {
+			    System.out.println("Sudoku ei ole täysi");
+		    }
+	    }else {
+		    System.out.println("Objekti ei ole Sudoku");
+	    }
+    }
 \end{javacode}
 Vaihtoehtoisesti luokka voisi sisältää booleanit täysi, oikein ratkaistu yms. ja printtaukset voisi silloin
 korvata booleanien muokkauksella.
