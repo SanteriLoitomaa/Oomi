@@ -49,9 +49,15 @@ jokaisen pyst ja vaakarivin ja ruudukon, varmistaen ettei sama luku esiinny kahd
 teksti joka kertoo lopputuloksen.
 \begin{javacode}
 /**
-	 * Tarkistaa onko annettu objekti sudoku dataa, kertoo sen jälkeen onko ruudukko oikein täytetty ja täysi.
+	 * Tarkistaa onko annettu objekti sudoku dataa, kertoo sen
+	   jälkeen onko ruudukko oikein täytetty ja täysi.
 	 * @.pre true
-	 * @.post (System.out.println("Objekti on Sudoku"); || System.out.println("Objekti ei ole Sudoku");) && ( System.out.println("Sudoku on väärin täytetty"); || System.out.println("Sudoku on oikein täytetty");) && (System.out.println("Sudoku on täysi"); || System.out.println("Sudoku ei ole täysi"); )
+	 * @.post (System.out.println("Objekti on Sudoku"); ||
+	   System.out.println("Objekti ei ole Sudoku");) &&
+	   ( System.out.println("Sudoku on väärin täytetty"); ||
+	   System.out.println("Sudoku on oikein täytetty");) &&
+	   (System.out.println("Sudoku on täysi"); ||
+	   System.out.println("Sudoku ei ole täysi"); )
 	 */
 	public static void sudokuTila(Object o){
 		boolean täysi = true;
@@ -59,7 +65,8 @@ teksti joka kertoo lopputuloksen.
 		boolean brake = false;
 		if (o instanceof Sudoku) {
 			System.out.println("Objekti on Sudoku");
-			// tästä alkaa tarkistus onko sudoku täytetty vai kesken
+			// tästä alkaa tarkistus onko sudoku
+			   täytetty vai kesken
 			for (int x=0; x<9; x++) {
 				for (int y=0; y<9; y++) {
 					if (((Sudoku) o).kenttä[x][y]==0) {
@@ -67,7 +74,8 @@ teksti joka kertoo lopputuloksen.
 					}
 				}
 			}
-			//Tästä alkaa tarkistus onko sudoku oikein täytetty (vasta vaakarivit)
+			//Tästä alkaa tarkistus onko sudoku oikein
+			  täytetty (vasta vaakarivit)
 			for (int luku=1;luku<10;luku++) {
 				for (int x=0; x<9; x++) {
 					int toistox = 0;
@@ -84,7 +92,8 @@ teksti joka kertoo lopputuloksen.
 						break;
 					}
 					if (toistox>1 || toistoy>1) {
-						System.out.println("Sudoku on väärin täytetty");
+						System.out.println("Sudoku on väärin
+						täytetty");
 						brake = true;
 					}
 				}
@@ -96,11 +105,13 @@ teksti joka kertoo lopputuloksen.
 						int toistoz = 0;
 						for (int x=0;x<3;x++) {
 							for (int y=0;y<3;y++) {
-								if (((Sudoku) o).kenttä[x+a*3][y+b*3]==luku) {
+								if (((Sudoku) o).kenttä[x+a*3]
+								[y+b*3]==luku) {
 									toistoz ++;
 								}
 								if (toistoz>1) {
-									System.out.println("Sudoku on väärin täytetty");
+									System.out.println("Sudoku
+									on väärin täytetty");
 									brake = true;
 								}
 								if (brake){
@@ -124,7 +135,8 @@ teksti joka kertoo lopputuloksen.
 				}
 			}
 			if (brake == false) {
-				System.out.println("Sudoku on oikein täytetty");
+				System.out.println("Sudoku on oikein
+				täytetty");
 			}
 			if (täysi) {
 				System.out.println("Sudoku on täysi");
