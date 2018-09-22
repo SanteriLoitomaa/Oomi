@@ -3,8 +3,9 @@
 
 \section{a-kohta}
 \label{a-kohta}
-Loin data-abstraktioksi luokan Sudoku, jolla on ominaisuus kenttä. Kenttä on 9x9 matriisi, joka automaattisesti
-sisältää int arvoja välillä 0-9 (defaultilla 0). Alla Sudoku luokan constructori.
+Loin data-abstraktioksi luokan Sudoku, jolla on ominaisuus kenttä. Kenttä on 9x9
+matriisi, joka automaattisesti sisältää int arvoja välillä 0-9 (defaultilla 0).
+Alla Sudoku luokan constructori.
 \begin{javacode}
 /**
    * Luo sudokuruudukko olion, jolla on ominaisuutena 9x9 matriisi kenttä.
@@ -159,9 +160,11 @@ lukujen paikkoja. Tarkentaisin tehtävänantoa määrityksellä siitä kumpaan s
 (tämä versio kääntää myötäpäivään.)
 \begin{javacode}
   /**
-   * Siirtää sudokun muuttujan kenttä lukujen paikkaa niin kuin oliota käännettäisiin 90 astetta.
+   * Siirtää sudokun muuttujan kenttä lukujen paikkaa niin kuin
+     oliota käännettäisiin 90 astetta.
    * @.pre true
-   * @.post s.kenttä[x][y] --> s.kenttä[8-y][x] || System.out.println("Objekti ei ole sudoku!");
+   * @.post s.kenttä[x][y] --> s.kenttä[8-y][x] ||
+     System.out.println("Objekti ei ole sudoku!");
    */
   public static void sudokuKaanto(Object s){
     if(onSudoku(s)) {
