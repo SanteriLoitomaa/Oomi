@@ -1,8 +1,191 @@
 
 \chapter{Tehtävä 2 \label{chap:Teht=0000E4v=0000E4-2}}
 
-Lisää tekstiä. Lisää tekstiä. Lisää
-tekstiä. Lisää tekstiä. Lisää tekstiä.
-Lisää tekstiä. Lisää tekstiä. Lisää
-tekstiä. Lisää tekstiä. Lisää tekstiä.
-Lisää tekstiä. Lisää tekstiä.
+\section{a-kohta}
+\label{a-kohta}
+Loin data-abstraktioksi luokan Sudoku, jolla on ominaisuus kenttä. Kenttä on 9x9 matriisi, joka automaattisesti
+sisältää int arvoja välillä 0-9 (defaultilla 0). Alla Sudoku luokan constructori.
+\begin{javacode}
+/**
+	 * Luo sudokuruudukko olion, jolla on ominaisuutena 9x9 matriisi kenttä.
+	 * @.pre true
+	 * @.post new Sudoku
+	 */
+	public Sudoku(){
+		int[][] kenttä = new int [9][9];
+	}
+\end{javacode}
+Luokka sisältää myös metodit lukujen katsomiseen tietyssä ruudussa ja lukujen lisäämiseen.
+
+
+\section{b-kohta}
+\label{b-kohta}
+ 
+ metodi onSudoku() ottaa vastaan objektin ja kertoo sitten oikeellisesti onko kyseessä sudoku olio, koska olion
+ kenttä on jo valmiiksi määritelty siten ettei se ota vastaan muuta kuin inttejä, niin kauan kun olio on sudoku
+ on sen data myös oikeellinen.
+\begin{javacode}
+/**
+	 * Tarkistaa että onko annettu objekti sudoku-data
+	 * @.pre true
+	 * @.post return true); || return false;
+	 */
+	public static boolean onSudoku(Object o){
+			if (o instanceof Sudoku) {
+				return true;
+			}else {
+				return false;
+			}
+	}
+\end{javacode}
+
+
+\section{c-kohta}
+\label{c-kohta}
+
+Metodi sudokuTila aloittaa tarkistamalla onko kyseesäs sudoku, hypäten suoraan loppuun jo se ei ole. Metodi käy
+sitten systemaattisesti läpi eri vaihtoehdot, tarkistaen onko jokaisessa ruudussa eri luku kuin 0. Tutkien sitten
+jokaisen pyst ja vaakarivin ja ruudukon, varmistaen ettei sama luku esiinny kahdesti. Kaikista näistä printataan
+teksti joka kertoo lopputuloksen.
+\begin{javacode}
+/**
+	 * Tarkistaa onko annettu objekti sudoku dataa, kertoo sen jälkeen onko ruudukko oikein täytetty ja täysi.
+	 * @.pre true
+	 * @.post (System.out.println("Objekti on Sudoku"); || System.out.println("Objekti ei ole Sudoku");) && ( System.out.println("Sudoku on väärin täytetty"); || System.out.println("Sudoku on oikein täytetty");) && (System.out.println("Sudoku on täysi"); || System.out.println("Sudoku ei ole täysi"); )
+	 */
+	public static void sudokuTila(Object o){
+		boolean täysi = true;
+		boolean oikein = true;
+		boolean brake = false;
+		if (o instanceof Sudoku) {
+			System.out.println("Objekti on Sudoku");
+			// tästä alkaa tarkistus onko sudoku täytetty vai kesken
+			for (int x=0; x<9; x++) {
+				for (int y=0; y<9; y++) {
+					if (((Sudoku) o).kenttä[x][y]==0) {
+						täysi = false;
+					}
+				}
+			}
+			//Tästä alkaa tarkistus onko sudoku oikein täytetty (vasta vaakarivit)
+			for (int luku=1;luku<10;luku++) {
+				for (int x=0; x<9; x++) {
+					int toistox = 0;
+					int toistoy = 0;
+					for (int y=0; y<9; y++) {
+						if (((Sudoku) o).kenttä[x][y]==luku) {
+							toistox ++;
+						}
+						if (((Sudoku) o).kenttä[y][x]==luku) {
+							toistoy ++;
+						}
+					}
+					if (brake){
+						break;
+					}
+					if (toistox>1 || toistoy>1) {
+						System.out.println("Sudoku on väärin täytetty");
+						brake = true;
+					}
+				}
+				if (brake){
+					break;
+				}
+				for (int a=0;a<3;a++) {
+					for (int b=0;b<3;b++) {
+						int toistoz = 0;
+						for (int x=0;x<3;x++) {
+							for (int y=0;y<3;y++) {
+								if (((Sudoku) o).kenttä[x+a*3][y+b*3]==luku) {
+									toistoz ++;
+								}
+								if (toistoz>1) {
+									System.out.println("Sudoku on väärin täytetty");
+									brake = true;
+								}
+								if (brake){
+									break;
+								}
+							}
+							if (brake){
+								break;
+							}
+						}
+						if (brake){
+							break;
+						}
+					}
+					if (brake){
+						break;
+					}
+				}
+				if (brake){
+					break;
+				}
+			}
+			if (brake == false) {
+				System.out.println("Sudoku on oikein täytetty");
+			}
+			if (täysi) {
+				System.out.println("Sudoku on täysi");
+			}else {
+				System.out.println("Sudoku ei ole täysi");
+			}
+		}else {
+			System.out.println("Objekti ei ole Sudoku");
+		}
+	}
+\end{javacode}
+Vaihtoehtoisesti luokka voisi sisältää booleanit täysi, oikein ratkaistu yms. ja printtaukset voisi silloin
+korvata booleanien muokkauksella.
+
+\section{d-kohta}
+\label{d-kohta}
+
+Metodi sudokuKaanto, ottaa vastaan objekti, varmistaen aluksi onko kyseessä sudoku, sitten kääntää muuttujan kenttä
+lukujen paikkoja. Tarkentaisin tehtävänantoa määrityksellä siitä kumpaan suuntaan sudokua tulee kääntää.
+(tämä versio kääntää myötäpäivään.)
+\begin{javacode}
+	/**
+	 * Siirtää sudokun muuttujan kenttä lukujen paikkaa niin kuin oliota käännettäisiin 90 astetta.
+	 * @.pre true
+	 * @.post s.kenttä[x][y] --> s.kenttä[8-y][x] || System.out.println("Objekti ei ole sudoku!");
+	 */
+	public static void sudokuKaanto(Object s){
+		if(onSudoku(s)) {
+			Sudoku clone = new Sudoku();
+			for (int x=0;x<9;x++) {
+				for (int y=0;y<9;y++) {
+					clone.täytä(8-y,x,((Sudoku)s).kenttä[x][y]);
+				}
+			}
+			for (int x=0;x<9;x++) {
+				for (int y=0;y<9;y++) {
+					((Sudoku)s).täytä(x,y,clone.kenttä[x][y]);
+				}
+			}
+		}else {
+			System.out.println("Objekti ei ole sudoku!");
+		}
+	}
+\end{javacode}
+
+\section{e-kohta}
+\label{e-kohta}
+
+Testin onnistuminen on varma, koska sudokun kääntö ei muuta sudoku oliota toiseksi olioksi, vaan muuttaa lukuja sen
+muuttujassa.
+
+\begin{javacode}
+class FlipTest {
+
+	@RepeatedTest(value = 1000)
+	void test() {
+		Sudoku sudoku = new Sudoku();
+		T2.sudokuKaanto(sudoku);
+		assertTrue(T2.onSudoku(sudoku));
+	}
+
+}
+\end{javacode}
+Lopputulos 0 errors & 0 failures
