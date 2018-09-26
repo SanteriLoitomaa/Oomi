@@ -419,7 +419,9 @@
 %\AtEndDocument{\addtocounter{totalcount@page}{-2}}
 
 \lstnewenvironment{javacode}
-  { \lstset{language=[10]Java} }
+  { \lstset{language=[10]Java,literate=
+  {ä}{{\"a}}1 {ö}{{\"o}}1
+  {Ä}{{\"A}}1 {Ö}{{\"O}}1 } }
   {}
 \lstnewenvironment{jscode}
   { \lstset{language=Javascript} }
