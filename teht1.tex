@@ -3,11 +3,11 @@
 
 Tehtävässä tutustutaan oom-kit -kehykseen ja siitä löytyviin luokkiin
 
-\section{Kohta A}
+\section{fi.utu.oomkit -luokat}
 
-\label{Kohta A}
+\label{fi.utu.oomkit -luokat}
 
-Gui -paketista löytyy luokat:
+fi.utu.oomkit.gui -paketista löytyy luokat:
 
 \begin{javacode}
 public interface Console {}
@@ -29,7 +29,7 @@ public interface WindowContent {}
 
 Joista kaikki ovat julkisia paketin sisällä, mutta paketin ulkopuolella
 näkyvistä on jätetty luokat DefaultDialogFactory, FXConsole, MergedStream ja
-StreamWrapper. Oom-kit -paketista löytyy luokat:
+StreamWrapper. fi.utu.oomkit -paketista löytyy luokat:
 
 \begin{javacode}
 public final class AppConfiguration {}
@@ -38,9 +38,9 @@ public interface AppLogic extends KeyHandler, Scheduled {}
 
 Joista kaikki ovat julkisia luokkia niin paketin sisällä kuin ulkopuolella.
 
-\section{Kohta B}
+\section{OOMApp -luokka sovelluksen ikkunan luomiseksi}
 
-\label{Kohta B}
+\label{OOMApp -luokka sovelluksen ikkunan luomiseksi}
  
 OOMApp -luokka peritään ja sille kirjoitetaan generateMainWindow -metodi.
 
@@ -56,8 +56,8 @@ public class DemoApp1 extends OOMApp {
 
     // kytkee piirtopinnan käyttöliittymään
     @Override
-    protected MainWindow generateMainWindow(String appName, double width, double height) {
-        return new SimpleMainWindow(appName, width, height) {
+    protected MainWindow generateMainWindow(String appName, double width,
+    double height) { return new SimpleMainWindow(appName, width, height) {
             @Override public SimpleCanvas mainContent() {
                 return gameLogic.piirtoPinta;
             }
@@ -70,10 +70,87 @@ EmptyApp -luokassa generateMainWindow -metodille on tehty mielekäs
 esimerkki-implementaatio, jolloin sitä voi käyttää sellaisenaan muodostaessa
 ohjelman ikkunaa. Siitä löytyy valmiiksi ajettava main-metodi.
 
-\section{Kohta C}
+\section{Ohjelman ikkunan sisällön hallitseminen}
 
-\label{Kohta C}
+\label{}
 
-KESKEN:
-Kuvaile lyhyesti tähän tarvit- tavat vaiheet. Mitä näkyviä osakomponentteja ikkunassa on ja miten niitä voi itse muokata. Kuvaile lyhyesti
-tähän liittyvät metodit.
+Ikkuna luodaan käyttämällä luokkaa MainWindow. Huomionarvoista on, että
+MainWindow -olion sisältö koostuu ylä- ja alapalkista, sekä
+Canvas-piirtoalueesta. Oletuksena nämä ovat tyhjiä, jolloin oman sisällön voi
+luoda ylikirjoittamalla metodit topBarContent(), mainContent(),
+bottomBarContent(). 
+
+\begin{javacode}
+public class EmptyApp extends OOMApp {
+	@Override
+	protected MainWindow generateMainWindow(){
+		return new SimpleMainWindow(appName, width, height) {
+			
+			@Override
+			public List<Node> topBarContent() { 
+				//return yläpalkin sisältö
+			}
+		
+			@Override
+			public Canvas mainContent() { 
+				//return pääsisältö
+			}
+		
+			@Override
+			public List<Node> bottomBarContent() { 
+				//return alapalkin sisältö
+			}
+		}
+	}
+}
+\end{javacode}
+
+Ylä- ja alapalkkiin voidaan lisätä mitä tahansa graafisia solmuja, jotka voivat
+olla erilaisia graafisia käyttöliittymäkomponentteja. Ylikirjoittamalla
+topBarContent() -metodin voidaan sijoittaa käyttöliittymään lista mitä tahansa
+elementtejä kuten esimerkiksi luokkien Canvas, ImageView, Shape tai Button
+luokkien olio. Yläpalkin lisäämisessä voitaisiin käyttää esimerkiksi seuraavaa
+metodia:
+
+\begin{javacode}
+@Override
+public List<Node> topBarContent() {
+	return Arrays.asList(
+		new Button("File"),
+		new Button("Edit"),
+		new Button("Window"),
+		new Button("Help")
+	);
+}
+\end{javacode}
+
+\section{Ohjelmanaikaiset tapahtumat}
+
+\label{D}
+
+OOMApp -luokan olion konstruktorilla pystytään luomaan useanlaisia logiikoita
+ohjelman suoritukseksi. Oma logiikka voidaan lisätä käyttämällä OOMApp
+konstruktoria, johon syötetään ohjelmalogiikka. Ohjelmalogiikkaluokka peritään
+AppLogic -luokalta. Seuraavassa esimerkissä on esitetty, kuinka MyLogic
+-luokalla voidaan hallita ohjelmalogiikkaa niin, että asiakkaan koodi
+suoritetaan joka 25ms.
+
+\begin{javacode}
+public class MyApp extends OOMApp {
+	public MyApp() {
+		super(new MyLogic());
+	}
+}
+
+public class MyLogic extends AppLogic {
+	@override
+	AppConfiguration configuration() {
+		return new AppConfiguration(25, "Asiakkaan ohjelma", true);
+	}
+    
+	@override
+	void tick() {
+		//asiakkaan koodi
+	}
+}
+\end{javacode}
