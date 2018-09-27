@@ -1,284 +1,79 @@
 
 \chapter{Tehtävä 1 \label{chap:Teht=0000E4v=0000E4-1}}
 
-Tässä tehtävässä pyydettiin kehittämään graafisen ohjelman värienhallinta metodeja.
+Tehtävässä tutustutaan oom-kit -kehykseen ja siitä löytyviin luokkiin
 
-\section{Kohta (1.a)}
+\section{Kohta A}
 
-\label{Kohta (1.a)}
+\label{Kohta A}
 
-Kohdassa (1.a) pyydettiin luomaan data-abstraktio väreille. Toteutin tämän luomalla Colour-luokan, jossa värit voidaan erottaa toisistaan String arvolla colour. Kohdassa pyydettiin myös luomaan 10 perusväriä kyseisellä menetelmällä. Itse päädyin väreihin Red, Blue, Yellow, Purple, Green, Orange, Brown, Black, Gray ja White.
+Gui -paketista löytyy luokat:
 
-\subsubsection{Tässä Colour-olion konstruktori}
-
-\label{Tässä Colour-olion konstruktori}
 \begin{javacode}
-/**
- * Creates a Colour object.
- * @.post new Colour created.
- * @param String colour
- */
-public Colour(String colour) throws InputMismatchException{
-	if(colour == null) {
-		throw new InputMismatchException(
-		"This colour is not supported.");
-	}
-	this.colour = colour;
+public interface Console {}
+class DefaultDialogFactory implements DialogFactory {}
+public interface DialogFactory {}
+class FXConsole extends OutputStream implements Console {}
+public interface MainWindow extends WindowContent {}
+public abstract class MainWindowBase implements MainWindow {}
+class MergedStream extends OutputStream {}
+public abstract class OOMApp extends Application {}
+public class ReactiveCanvas<X> extends SimpleCanvas implements Observer<X> {}
+public class ReactiveLabel<T> extends Label implements Observer<T> {
+	public interface LabelHandler<T> {}
+}
+public class SimpleCanvas extends Canvas {}
+class StreamWrapper extends OutputStream {}
+public interface WindowContent {}
+\end{javacode}
+
+Joista kaikki ovat julkisia paketin sisällä, mutta paketin ulkopuolella
+näkyvistä on jätetty luokat DefaultDialogFactory, FXConsole, MergedStream ja
+StreamWrapper. Oom-kit -paketista löytyy luokat:
+
+\begin{javacode}
+public final class AppConfiguration {}
+public interface AppLogic extends KeyHandler, Scheduled {}
+\end{javacode}
+
+Joista kaikki ovat julkisia luokkia niin paketin sisällä kuin ulkopuolella.
+
+\section{Kohta B}
+
+\label{Kohta B}
+ 
+OOMApp -luokka peritään ja sille kirjoitetaan generateMainWindow -metodi.
+
+GenerateMainWindow -metodilla määritellään mikä on ohjelman (=app) nimi ja
+kuinka ison alueen ohjelma käyttää. Metodin tulee palauttaa MainWindow
+-alaluokka. OOMApp -luokan käyttöä on esitetty DemoApp1 -tutoriaalissa
+seuraavasti:
+
+\begin{javacode}
+public class DemoApp1 extends OOMApp {
+    // alustaa pelilogiikan
+    final static LaatikkoGameLogic gameLogic = new LaatikkoGameLogic();
+
+    // kytkee piirtopinnan käyttöliittymään
+    @Override
+    protected MainWindow generateMainWindow(String appName, double width, double height) {
+        return new SimpleMainWindow(appName, width, height) {
+            @Override public SimpleCanvas mainContent() {
+                return gameLogic.piirtoPinta;
+            }
+        };
+    }
 }
 \end{javacode}
 
-\subsubsection{Tässä Colour-olioiden luonti ArrayList-olioon}
+EmptyApp -luokassa generateMainWindow -metodille on tehty mielekäs
+esimerkki-implementaatio, jolloin sitä voi käyttää sellaisenaan muodostaessa
+ohjelman ikkunaa. Siitä löytyy valmiiksi ajettava main-metodi.
 
-\label{Tässä Colour-olioiden luonti ArrayList-olioon}
-\begin{javacode}
-ArrayList<Colour> colours = new ArrayList<Colour>(Arrays.asList(
-	new Colour("Red"), new Colour("Blue"), new Colour("Yellow"),
-	new Colour("Purple"), new Colour("Green"),
-	new Colour("Orange"), new Colour("Brown"),
-	new Colour("Black"), new Colour("Gray"),
-	new Colour("White")));
-\end{javacode}
+\section{Kohta C}
 
-\section{Kohta (1.b)}
+\label{Kohta C}
 
-\label{Kohta (1.b)}
-
-Kohdassa (1.b) pyydettiin luomaan jokin metodi, jonka avulla voitaisiin tunnistaa, ovatko 2 väriä samat. Tekemäni Colour-oliot voidaan erotella toisistaan niiden String colour-arvon perusteella.
-
-\subsubsection{Tässä yksinkertainen equals()-metodi}
-
-\label{Tässä yksinkertainen equals()-metodi}
-\begin{javacode}
-/**
- * Returns true if the colours are the same.
- * @param Colour colour
- * @return true if the same Colour, false if not.
- */
-@Test
-public boolean equals(Colour colour) {
-	if(colour == null) {
-		return false;
-	}
-	else if(this.colour.equals(colour.colour))
-		return true;
-	return false;
-}
-\end{javacode}
-
-\section{Kohta (1.c)}
-
-\label{Kohta (1.c)}
-
-Kohdassa (1.c) kysytään määrittelyn teknisistä rajoitteista ja sopivuudesta ulkopuoliseen käyttöön. Tällä hetkellä Colour-olio ei ole oikein käyttökelpoinen, sillä sillä ei ole kohtaa värin hex-arvolle, jonka koen hyvinkin tärkeäksi. Se tosin on helposti lisättävissä pienellä päivityksellä. Tekemäni Colour olio tosin on hyvinkin helppo ottaa käyttöön ulkopuoliseen sovellukseen, kuten itse todistin tekemällä juuri niin. Lopullinen ohjelma, josta suoritukseni näkee, on saatavilla \href{https://github.com/Santtinen/oomharj1}{GitHubistani}. Sen tärkeänä osana toimii Colours-luokka.
-
-\subsubsection{Colours-luokka}
-
-\label{Colours-luokka}
-\begin{javacode}
-public class Colours {
-	static ArrayList<Colour> colours = new ArrayList<Colour>();
-	static ArrayList<Colour> randomColours =
-		 new ArrayList<Colour>();
-	/**
-	 * Creates the Colours.txt with the default 10 colours if it
-	 * doesn't exsist and creates an ArrayList out of it.
-	 * @.post !Colours.equals(new ArrayList<Colour>())
-	 */
-	@SuppressWarnings("unchecked")
-	public static void init() {
-		try {
-			FileInputStream file =
-				new FileInputStream("Colours.txt");
-			ObjectInputStream load =
-				new ObjectInputStream(file);
-			colours = (ArrayList<Colour>) load.readObject();
-			load.close();
-		} catch (FileNotFoundException e) {
-			colours = new ArrayList<Colour>(Arrays.asList
-			(new Colour("Red"), new Colour("Blue"),
-			new Colour("Yellow"), new Colour("Purple"),
-			new Colour("Green"), new Colour("Orange"),
-			new Colour("Brown"), new Colour("Black"),
-			new Colour("Gray"),
-			new Colour("White")));
-			try {
-				FileOutputStream file =
-				new FileOutputStream("Colours.txt");
-				ObjectOutputStream save =
-				new ObjectOutputStream(file);
-				save.writeObject(colours);
-				save.close();
-			} catch (IOException e1) {
-				
-			}
-		} catch (IOException e) {
-			colours = new ArrayList<Colour>(Arrays.asList
-			(new Colour("Red"), new Colour("Blue"),
-			new Colour("Yellow"), new Colour("Purple"),
-			new Colour("Green"), new Colour("Orange"),
-			new Colour("Brown"), new Colour("Black"),
-			new Colour("Gray"),
-			new Colour("White")));
-		} catch (ClassNotFoundException e) {
-			colours = new ArrayList<Colour>(Arrays.asList
-			(new Colour("Red"), new Colour("Blue"),
-			new Colour("Yellow"), new Colour("Purple"),
-			new Colour("Green"), new Colour("Orange"),
-			new Colour("Brown"), new Colour("Black"),
-			new Colour("Gray"),
-			new Colour("White")));
-		}
-	}
-	/**
-	 * This method returns true if the Colour can be used and
-	 * false if it cannot be used.
-	 * @param Colour c
-	 * @return true if can be used, otherwise false
-	 */
-	public static boolean canUseColour(Colour colour) {
-		if(colour == null) return false;
-		else if(colours.contains(colour)) return true;
-		return false;
-	}
-	/**
-	 * This method returns true if the Colour can be used and
-	 * false if it cannot be used.
-	 * @param Colour c
-	 * @return true if can be used, otherwise false
-	 */
-	public static boolean canUseRandomColour(Colour colour) {
-		if(colour == null) return false;
-		else if(randomColours.contains(colour)) return true;
-		return false;
-	}
-	/**
-	 * This method is used to add a colour to the colours ArrayList
-	 * @.post colours = OLD.colours + colour
-	 * @param colour (to add)
-	 */
-	public static void addColour(Colour colour){
-		if(colour == null) return;
-		colours.add(colour);
-		try {
-			FileOutputStream colours =
-				new FileOutputStream("Colours.txt");
-			ObjectOutputStream save =
-				new ObjectOutputStream(colours);
-			save.writeObject(colours);
-			save.close();
-		} catch (IOException e1) {
-			
-		}
-	}
-	/**
-	 * This method is used to add a colour to the colours ArrayList
-	 * @.post colours = OLD.colours + colour
-	 * @param colour (to add)
-	 */
-	@Test
-	public static void addRandomColour(Colour colour){
-		if(colour == null) return;
-		randomColours.add(colour);
-	}
-	/**
-	 * A method that will randomize colours for an ArrayList that
-	 * contains a random amount of colours from the colours
-	 * ArrayList.
-	 * @.post The contents of the randomColours ArrayList changes.
-	 */
-	public static void createRandomColours() {
-		randomColours = new ArrayList<Colour>();
-		Random r = new Random();
-		for(int i = r.nextInt(colours.size()-1);
-		 i < colours.size(); i++) {
-			Colour c =
-			colours.get(r.nextInt(colours.size()));
-			if(!randomColours.contains(c))
-				randomColours.add(c);
-		}
-	}
-	/**
-	 * A getter for the randomColours ArrayList.
-	 * @return randomColours
-	 */
-	public static ArrayList<Colour> getRandomColours(){
-		return randomColours;
-	}
-	/**
-	 * A getter for the colours ArrayList.
-	 * @return colours
-	 */
-	public static ArrayList<Colour> getColours(){
-		return colours;
-	}
-}
-\end{javacode}
-
-\pagebreak
-
-\section{Kohta (1.d)}
-
-\label{Kohta (1.d)}
-
-Kohdassa (1.d) pyydettiin luomaan metodi, joka arpoo käyttäjän käyttöön satunnaiset värit. Toteutin sen Colours-luokassa näin:
-
-\begin{javacode}
-/**
- * A method that will randomize colours for an ArrayList that
- * contains a random amount of colours from the colours
- * ArrayList.
- * @.post The contents of the randomColours ArrayList randomly changes.
- */
-public static void createRandomColours() {
-	randomColours = new ArrayList<Colour>();
-	Random r = new Random();
-	for(int i = r.nextInt(colours.size()-1);
-	 i < colours.size(); i++) {
-		Colour c =
-		colours.get(r.nextInt(colours.size()));
-		if(!randomColours.contains(c))
-			randomColours.add(c);
-	}
-}
-\end{javacode}
-
-Metodi arpoo satunnaisen määrän satunnaisia värejä Random r-olion avulla. Koska lopputulos on satunnainen, totean @.post-kohdassa lopputuloksen olevan randomColours ArrayList-olion satunnainen muutos.
-
-\pagebreak
-
-\section{Kohta (1.e)}
-
-\label{Kohta (1.e)}
-
-Kohdassa (1.e) pyydettiin luomaan JUnit testi equals()-metodille, joka luotiin tehtävässä \cite{Kohta (1.b)}.
-
-\subsubsection{Tässä testiluokkani ja sen tulostukset}
-
-\label{Tässä testiluokkani ja sen tulostukset}
-\begin{javacode}
-class ColoursTest {
-
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-		Colours.init();
-	}
-
-	@Test
-	void test() {
-		System.out.print("This should be true: ");
-		System.out.println(Colours.getColours().get(0)
-			.equals(Colours.getColours().get(0)));
-		System.out.print("This should be false: ");
-		System.out.println(Colours.getColours().get(0)
-			.equals(Colours.getColours().get(1)));
-	}
-
-}
-
-This should be true: true
-This should be false: false
-
-0 errors 0 failures
-\end{javacode}
-
-Tekijänä Santeri Loitomaa (516587).
+KESKEN:
+Kuvaile lyhyesti tähän tarvit- tavat vaiheet. Mitä näkyviä osakomponentteja ikkunassa on ja miten niitä voi itse muokata. Kuvaile lyhyesti
+tähän liittyvät metodit.
