@@ -3,182 +3,284 @@
 
 \section{a-kohta}
 \label{a-kohta}
-Luokka lopputeksti sisältää intit rivimäärällä ja max merkkimäärän, sen lisäksi String Arrayn jossa on
-kaikki kirjoitettava teksti. Luokassa on erikseen metodi yksittäisten rivien merkkimäärän tarkistukseen
-ja koko lopputeksti olion tarkastukseen. Näiden lisäksi on mukana metodit tekstin lukemiseen ja
-muokkaamiseen.
+Loin uuden MatoPelaaja luokan, jonne tallentuu pelaajan pisteet kokonaislukuna, nimi lukujonona,väri javafx Color-oliona ja sen hetkinen pituus myös kokonaislukuna. Luokasta löytyy metodit pisteiden ja pituuden muuttamiseen.
+\section{a-kohta}
+\label{a-kohta}
+Loin myös MatoNäkymä luokan jonka avulla mato piiretään peliin. Luokassa on madon
+pää erikseen pisteenä ja loppu mato ArrayListissa ja tietää nykyisen suunnan.
+
+Käytin tehtävässä pohjana valmista pohjakoodia jota olen muutellut jonkin verran.
+
 \begin{javacode}
-public class Lopputeksti {
-    int rivimäärä;
-    int merkkimäärä;
-    String[] sisältö;
-    
-    /**
-     * Luo lopputeksti luokan ja testaa onko sen sisältämä teksti liian pitkää yms.
-       ilmoittaen siitä jos näin on.
-     * @.pre r = int, m = int, s String[]
-     * @.post new Lopputeksti (&& Throw IndexOutOfBoundsException & virheilmoitus)
-     */
-    public Lopputeksti(int r, int m, String[] s) {
-      this.rivimäärä=r;
-      this.merkkimäärä=m;
-      this.sisältö=s;
-      rajoitteet(r,m,s);
-    }
-    /**
-     * Tarkistaa ja ilmoittaa onko lopputeksti haluttujen rajojen mukaista.
-     * @.pre r = int, m = int, s String[]
-     * @.post (IndexOutOfBoundsException & Ilmoitus virheestä)
-     */
-    public void rajoitteet(int rm, int mm, String[] syöte) {
-      for (int x=0;x<syöte.length;x++) {
-        if (riviTarkistus(syöte[x],mm) == false) {
-          try {
-            throw new IndexOutOfBoundsException();
-          } catch (IndexOutOfBoundsException i) {
-              System.out.println("Rivillä " + x+1 + ". on liian monta merkkiä!");
-          }
-        }
-      }
-      if (rm<syöte.length) {
-        try {
-          throw new IndexOutOfBoundsException();
-        } catch (IndexOutOfBoundsException i) {
-            System.out.println("Rivejä on liikaa!");
-        }
-      }
-    }
-    /**
-     * Tarkistaa rivin merkkimäärän, verraten sitä sallittuun maksimiin
-     * @p.pre tarkistettava = String, maksimi = int
-     * @.post return true || false
-     */
-    public boolean riviTarkistus(String tarkistettava, int maksimi) {
-      if (tarkistettava.length()>maksimi) {
-        return false;
-      }
-      return true;
-    }
-    /**
-     * Muokkaa annetun rivin tekstiä
-     * @.pre rivi = int, uusi = String
-     * @.post sisältö[rivi] = uusi;
-     */
-    public void tekstinMuokkaus(int rivi, String uusi ) {
-      sisältö[rivi] = uusi;
-    }
-    /**
-     * Palauttaa annetun rivin
-     * @.pre rivi = int
-     * @.post return sisältö[rivi];
-     */
-    public String tekstinLuku(int rivi) {
-      return sisältö[rivi];
-    }
-  }
-\end{javacode}
+package fi.utu.oomkit.examples.emptyapp;
 
 
 
-\section{b-kohta}
-\label{b-kohta}
- 
-Luokkaan Lopputeksti lisättiin seuraavat kaksi metodia
-\begin{javacode}
+import fi.utu.oomkit.AppConfiguration;
+import fi.utu.oomkit.AppLogic;
+import fi.utu.oomkit.gui.MainWindow;
+import fi.utu.oomkit.gui.OOMApp;
+import fi.utu.oomkit.gui.SimpleCanvas;
+import fi.utu.oomkit.util.Point;
+import fi.utu.oomkit.util.KeyHandler.Key;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
+import java.awt.event.*;
+
 /**
-     * Siirtää piirrettävän tekstin y koordinaattia ja kutsuu komentoa piirrärivi
-     * @.pre true
-     * @.post Point c = new Point (p.x,(p.y + i*size)); &&
-     *        piirräRivi(piirtopinta, canvas,c,size, i);
-     */
-    public void piirräTeksti(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, Point p, int size) {
-      for (int i = 0; i<sisältö.length;i++) {
-        Point c = new Point (p.x,(p.y + i*size));
-        piirräRivi(piirtopinta, canvas,c,size, i);
-      }
-      
+ * LaatikkoPiirtopinta. KÃ¤yttÃ¶liittymÃ¤ huolehtii teknisestÃ¤ toteutuksesta.
+ * @see this.redraw() PiirrÃ¤ uudestaan, riittÃ¤Ã¤ kutsua vain kun sisÃ¤ltÃ¶ muuttuu.
+ * @see this.drawForegroundContent(canvas) piirtÃ¤Ã¤ "edustan"
+ * @see this.drawBackgroundContent(canvas) piirtÃ¤Ã¤ "taustan", oletus: tÃ¤ysin valkoinen
+ */
+class LaatikkoPiirtopinta extends SimpleCanvas {
+    private final int koko = 12;
+    private Point piste;
+    private MatoNäkymä mauno;
+
+    LaatikkoPiirtopinta() { super(true);
+    mauno=new MatoNäkymä();}
+
+    // asettaa piirrettÃ¤vÃ¤n pisteen
+    void asetaPiste(Point piste) {
+        this.piste = piste;
     }
-    /**
-     * Käy annetun tekstin kirjain kirjaimelta ja muuttaa x koordinaattia sopivasti,
-       kutsuen sitten drawText metodia.
-     * @.pre true
-     * @.post Point b = new Point ((p.x + i*size), p.y);
-          piirtopinta.drawText(canvas, b, l, size);
-     */
-    private void piirräRivi(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, Point p, int size, int row) {
-      for (int i=0; i<sisältö[row].length();i++) {
-        char l = sisältö[row].charAt(i);
-        Point b = new Point ((p.x + i*size), p.y);
-        piirtopinta.drawText(canvas, b, l, size);
-      }
+
+    // piirtÃ¤Ã¤ pisteen p size-kokoisena neliÃ¶nÃ¤, vas. ylÃ¤reuna = p
+    private void drawRectangle(GraphicsContext canvas, Point p, int size) {
+        canvas.setFill(javafx.scene.paint.Color.DARKBLUE);
+        canvas.fillRect(p.x, p.y, size, size);
+        
+        
     }
-\end{javacode}
-Joiden avulla kutsutaan TextDraw metodia tekstin kirjoittamiseksi. Tämä testattiin DemoApp2 sisällä, luomalla
-testiolio Tekstipiirtopinnassa ja kutsumalla sitä drawForeGrounddContent sisältä. Lopputuloksena oli valmis
-teksti ruudulla.
-\begin{javacode}
-Point a = new Point(50,50);
-testi.piirräTeksti(this, canvas, a, koko);
+
+    // piirrÃ¤ piste, jos koordinaatti olemassa (piste != null)
+    protected void drawForegroundContent(GraphicsContext canvas) {
+        if (piste != null) {
+        	drawRectangle(canvas, piste, koko);
+        	}
+        if(mauno!=null) {
+        	mauno.draw(canvas);
+        }
+    }
+}
+
+class LaatikkoGameLogic implements AppLogic {
+    final LaatikkoPiirtopinta piirtoPinta = new LaatikkoPiirtopinta();
+    private final int reuna = 25;
+
+    private int liikkeenTila = 0;
+    private Point piste = new Point(reuna, reuna);
+    private MatoNäkymä mauno = new MatoNäkymä();
+    Point pää = mauno.getPää();
+  
+
+    // alustaa pelin logiikan, pÃ¤ivitys 20ms vÃ¤lein
+    @Override
+    public AppConfiguration configuration() {
+        return new AppConfiguration(20, "Demo", false);
+    }
+
+    @Override
+    public void tick() {
+        double max_x = piirtoPinta.getWidth() - reuna;
+        double max_y = piirtoPinta.getHeight() - reuna;
+        switch (mauno.AnnaSuunta()) {
+       
+            case 'D':
+            	
+                if (piste.x < max_x) {
+                	piste = piste.add(5, 0);
+                }
+                
+                
+                
+                break;
+            case 'S':
+                if (piste.y < max_y)
+                    piste = piste.add(0, 5);
+                
+                break;
+            case 'A':
+                if (piste.x > reuna)
+                    piste = piste.add(-5, 0);
+                
+                break;
+            case 'W':
+            	
+                if (piste.y > reuna)
+                    piste = piste.add(0, -5);
+                break;
+        }
+        
+        piirtoPinta.asetaPiste(mauno.getPää());
+        piirtoPinta.asetaPiste(piste);
+        piirtoPinta.redraw();
+    }
+
+public void Törmäys() {
+	if(piste.x==mauno.getPää().x && piste.y==mauno.getPää().y) {
+		piirtoPinta.asetaPiste(Point.generateRandomPoint((int)piirtoPinta.getWidth(),(int)piirtoPinta.getHeight()));
+	}
+	if()
+}
+
+public void handleKey(Key k) {
+	if(k.equals(Key.A)) {
+		piste = piste.add(-5,0);
+		mauno.vaihdaSuunta('A');
+	}
+	if(k.equals(Key.W)) {
+		piste = piste.add(0,-5);
+		mauno.vaihdaSuunta('W');
+	}
+	if(k.equals(Key.D)) {
+		piste = piste.add(5,0);
+		mauno.vaihdaSuunta('D');
+	}
+	if(k.equals(Key.S)) {
+		piste = piste.add(0,5);
+		mauno.vaihdaSuunta('S');
+	}
+	System.out.println(k + " pressed!"); 
+}
+}
+
+
+public class DemoApp1 extends OOMApp {
+    // alustaa pelilogiikan
+    final static LaatikkoGameLogic gameLogic = new LaatikkoGameLogic();
+
+    // kytkee piirtopinnan kÃ¤yttÃ¶liittymÃ¤Ã¤n
+    @Override
+    protected MainWindow generateMainWindow(String appName, double width, double height) {
+        return new SimpleMainWindow(appName, width, height) {
+            @Override public SimpleCanvas mainContent() {
+                return gameLogic.piirtoPinta;
+            }
+        };
+    }
+
+    // alustaa demo-ohjelman (kÃ¤yttÃ¶liittymÃ¤)
+    public DemoApp1() {
+        super(gameLogic);
+    }
+
+    // alustaa demo-ohjelman (JavaFX)
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+}
 \end{javacode}
 
 \section{c-kohta}
 \label{c-kohta}
-
-Metodi piirräKirjainKerralla piirtää lopputeksti olion kirjaimia yksi kerrallaan. Ja lopettaa piirtämästä
-kun koko lopputeksti on päästy loppuun.
+MatoPelaajan koodi.
 \begin{javacode}
-/**
-     * Metodi ottaa annetuilla luvuilla kirjaimia lopputeksteistä ja kirjoittaa ne niille kuuluville kohdille.
-     * @.pre true
-     * @.post piirtopinta.drawText(canvas, point, letter, size);
-     */
-    public void piirräKirjainKerralla(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, int t, int size) {
-      int x = 0;
-      int a = t;
-      boolean kill = false;
-      while (a>=sisältö[x].length()) {
-        a= a-sisältö[x].length();
-        x++;
-        if (x>=sisältö.length) {
-          kill = true;
-          break;
-        }
-      }
-      if (kill == false) {
-        char letter = sisältö[x].charAt(a);
-        Point point = new Point ((a*size+50),(x*size+50));
-        piirtopinta.drawText(canvas, point, letter, size);
-      }
-      
-    }
-\end{javacode}
-int t määritellään tickissä ja se kasvaa jokaisella tickin kutsulla, täten se käy lopputekstit läpi
-järjestyksessä. Olio itsessään luotiin tekstiGameLogicissa ja kutsuttiin tickissä.
+package fi.utu.oomkit.examples.emptyapp;
 
-Luonti textGameLogicissa
-\begin{javacode}
-  private int i = 0;
-    String[] joku = new String[] {"moi","moi taas","abcdefghijklmnopqrs"};
-    Lopputeksti testi = new Lopputeksti(25,10,joku);
+import javafx.scene.paint.Color;
+
+public class MatoPelaaja {
+	
+	private int pistesumma;
+	private String nimi;
+	 Color väri;
+	private int pituus ;
+	
+	public MatoPelaaja(String nimi) {
+		this.nimi=nimi;
+		pituus = 5;
+		väri = Color.GOLD;
+	}
+	public void addPoints(int p) {
+		pistesumma = pistesumma+p;
+	}
+	public void muutaPituus(int p) {
+		pituus += p;
+	}
+
+}
+
 \end{javacode}
 
-kutsu Tickissä
-\begin{javacode}
-testi.piirräKirjainKerralla(piirtoPinta, piirtoPinta.getGraphicsContext2D(), i, 24);
-\end{javacode}
-
-Kussakin "sarakkessa" ts. Stringissä on vain riville kirjoitettavat merkit, joten niissä ei ole ylimääräistä,
-toki jos rivin suorituksen haluaa kestävän kauemmin voi rivin loppuun lisätä välilyöntejä.
 \section{d-kohta}
 \label{d-kohta}
 
-Aiemman tehtävänannon metodi ei muutu, tickissä vain lineaarisesti kasvavan i:n sijasta arvotaan se Randomia
-hyväksikäyttäen. Antane lopputekstin kirjainten tulla satunnaisessa järjestyksessä.
+MatoNäkymän Koodi.
+
 \begin{javacode}
-  Random r = new Random();
-      i = r.nextInt(30);
+package fi.utu.oomkit.examples.emptyapp;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+
+import fi.utu.oomkit.util.KeyHandler;
+import fi.utu.oomkit.util.Point;
+import javafx.scene.canvas.GraphicsContext;
+import fi.utu.oomkit.util.KeyHandler.Key;
+
+//Luokka Madon piirtämisen avuksi
+public class MatoNäkymä   {
+	private Point pää;
+	ArrayList<Point> häntä;
+	protected char suunta;
+	protected MatoPelaaja mauno = new MatoPelaaja("Mauno Matonen");
+	
+	public MatoNäkymä() {
+		pää = new Point(100,25);
+		suunta = 'D';
+		häntä = new ArrayList<Point>();
+		while(häntä.size()<5) {
+			häntä.add(new Point(100-15*häntä.size(),25));}
+		
+	}
+	public boolean törmäys(Point p) {
+		if(pää.equals(p)) {
+
+			int x = häntä.get(häntä.size()-1).x;
+			int y = häntä.get(häntä.size()-1).y;
+			häntä.add(new Point(x-15,y-15));
+			return true;
+		}else if(häntä.contains(p)) {return true;}
+		else if(häntä.contains(pää)) {return true;}
+		return false;
+		}
+	public Point getPää() {
+		return pää;
+	}
+	public void setPää(Point pää) {
+		this.pää=pää;
+	}
+	public void vaihdaSuunta(char c) {
+		suunta = c;
+	}
+	public char AnnaSuunta() {
+		return suunta;
+	}
+	
+	public void draw(GraphicsContext canvas) {
+		canvas.setFill(mauno.väri);
+        canvas.fillRect(pää.x, pää.y, 12, 12);
+        for(Point p : häntä) {
+        	canvas.setFill(mauno.väri);
+            canvas.fillRect(p.x, p.y, 12, 12);
+        }
+	}
+	 
+		
+    
+}
+
+
 \end{javacode}
 
 
 
-Tekijänä Tommi Heikkinen (517749)
+
+
+
+
+Tekijänä Janina Kuosmanen (516580)
