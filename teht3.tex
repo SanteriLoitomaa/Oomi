@@ -2,10 +2,10 @@
 
 \section{a-kohta}
 \label{a-kohta}
-Luokka lopputeksti sisältää intit rivimäärällä ja max merkkimäärän, sen lisäksi String Arrayn jossa on
-kaikki kirjoitettava teksti. Luokassa on erikseen metodi yksittäisten rivien merkkimäärän tarkistukseen
-ja koko lopputeksti olion tarkastukseen. Näiden lisäksi on mukana metodit tekstin lukemiseen ja
-muokkaamiseen.
+Luokka lopputeksti sisältää intit rivimäärällä ja max merkkimäärän, sen lisäksi
+String Arrayn jossa on kaikki kirjoitettava teksti. Luokassa on erikseen metodi
+yksittäisten rivien merkkimäärän tarkistukseen ja koko lopputeksti olion
+tarkastukseen. Näiden lisäksi on mukana metodit tekstin lukemiseen ja muokkaamiseen.
 \begin{javacode}
 public class Lopputeksti {
     int rivimäärä;
@@ -90,8 +90,8 @@ Luokkaan Lopputeksti lisättiin seuraavat kaksi metodia
      * @.post Point c = new Point (p.x,(p.y + i*size)); &&
      *        piirräRivi(piirtopinta, canvas,c,size, i);
      */
-    public void piirräTeksti(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, Point p, int size) {
-      for (int i = 0; i<sisältö.length;i++) {
+    public void piirräTeksti(TekstiPiirtopinta piirtopinta, GraphicsContext
+    canvas, Point p, int size) { for (int i = 0; i<sisältö.length;i++) {
         Point c = new Point (p.x,(p.y + i*size));
         piirräRivi(piirtopinta, canvas,c,size, i);
       }
@@ -104,16 +104,16 @@ Luokkaan Lopputeksti lisättiin seuraavat kaksi metodia
      * @.post Point b = new Point ((p.x + i*size), p.y);
           piirtopinta.drawText(canvas, b, l, size);
      */
-    private void piirräRivi(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, Point p, int size, int row) {
-      for (int i=0; i<sisältö[row].length();i++) {
-        char l = sisältö[row].charAt(i);
-        Point b = new Point ((p.x + i*size), p.y);
-        piirtopinta.drawText(canvas, b, l, size);
+    private void piirräRivi(TekstiPiirtopinta piirtopinta, GraphicsContext
+    canvas, Point p, int size, int row) { for (int i=0; i <
+    sisältö[row].length(); i++) { char l = sisältö[row].charAt(i); Point b = new
+    Point ((p.x + i*size), p.y); piirtopinta.drawText(canvas, b, l, size);
       }
     }
 \end{javacode}
-Joiden avulla kutsutaan TextDraw metodia tekstin kirjoittamiseksi. Tämä testattiin DemoApp2 sisällä, luomalla
-testiolio Tekstipiirtopinnassa ja kutsumalla sitä drawForeGrounddContent sisältä. Lopputuloksena oli valmis
+Joiden avulla kutsutaan TextDraw metodia tekstin kirjoittamiseksi. Tämä
+testattiin DemoApp2 sisällä, luomalla testiolio Tekstipiirtopinnassa ja
+kutsumalla sitä drawForeGrounddContent sisältä. Lopputuloksena oli valmis
 teksti ruudulla.
 \begin{javacode}
 Point a = new Point(50,50);
@@ -123,15 +123,17 @@ testi.piirräTeksti(this, canvas, a, koko);
 \section{c-kohta}
 \label{c-kohta}
 
-Metodi piirräKirjainKerralla piirtää lopputeksti olion kirjaimia yksi kerrallaan. Ja lopettaa piirtämästä
-kun koko lopputeksti on päästy loppuun.
+Metodi piirräKirjainKerralla piirtää lopputeksti olion kirjaimia yksi
+kerrallaan. Ja lopettaa piirtämästä kun koko lopputeksti on päästy loppuun.
 \begin{javacode}
 /**
-     * Metodi ottaa annetuilla luvuilla kirjaimia lopputeksteistä ja kirjoittaa ne niille kuuluville kohdille.
+     * Metodi ottaa annetuilla luvuilla kirjaimia lopputeksteistä ja kirjoittaa
+     ne niille kuuluville kohdille.
      * @.pre true
      * @.post piirtopinta.drawText(canvas, point, letter, size);
      */
-    public void piirräKirjainKerralla(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, int t, int size) {
+    public void piirräKirjainKerralla(TekstiPiirtopinta piirtopinta,
+    GraphicsContext canvas, int t, int size) { 
       int x = 0;
       int a = t;
       boolean kill = false;
@@ -151,8 +153,9 @@ kun koko lopputeksti on päästy loppuun.
       
     }
 \end{javacode}
-int t määritellään tickissä ja se kasvaa jokaisella tickin kutsulla, täten se käy lopputekstit läpi
-järjestyksessä. Olio itsessään luotiin tekstiGameLogicissa ja kutsuttiin tickissä.
+int t määritellään tickissä ja se kasvaa jokaisella tickin kutsulla, täten se
+käy lopputekstit läpi järjestyksessä. Olio itsessään luotiin tekstiGameLogicissa
+ja kutsuttiin tickissä.
 
 Luonti textGameLogicissa
 \begin{javacode}
@@ -166,13 +169,15 @@ kutsu Tickissä
 testi.piirräKirjainKerralla(piirtoPinta, piirtoPinta.getGraphicsContext2D(), i, 24);
 \end{javacode}
 
-Kussakin "sarakkessa" ts. Stringissä on vain riville kirjoitettavat merkit, joten niissä ei ole ylimääräistä,
-toki jos rivin suorituksen haluaa kestävän kauemmin voi rivin loppuun lisätä välilyöntejä.
+Kussakin "sarakkessa" ts. Stringissä on vain riville kirjoitettavat merkit,
+joten niissä ei ole ylimääräistä, toki jos rivin suorituksen haluaa kestävän
+kauemmin voi rivin loppuun lisätä välilyöntejä.
 \section{d-kohta}
 \label{d-kohta}
 
-Aiemman tehtävänannon metodi ei muutu, tickissä vain lineaarisesti kasvavan i:n sijasta arvotaan se Randomia
-hyväksikäyttäen. Antane lopputekstin kirjainten tulla satunnaisessa järjestyksessä.
+Aiemman tehtävänannon metodi ei muutu, tickissä vain lineaarisesti kasvavan i:n
+sijasta arvotaan se Randomia hyväksikäyttäen. Antane lopputekstin kirjainten
+tulla satunnaisessa järjestyksessä.
 \begin{javacode}
   Random r = new Random();
       i = r.nextInt(30);
