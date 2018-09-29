@@ -1,5 +1,5 @@
 
-\chapter{Tehtävä 4 \label{chap:Teht=0000E4v=0000E4-1}}
+\chapter{Tehtävä 4 \label{chap:Teht=0000E4v=0000E4-4}}
 
 Tehtävän tarkoituksena on luoda lukitusmenetelmä OOMKit-ohjelmiin, joka estää kaiken näkyvyyden ohjelmaan kunnes ohjelman avaava koodi syötetään täysin oikein. Aikarajaa salasanan syöttöön ei ole.
 
@@ -98,12 +98,13 @@ DemoApp3:een tein seuraavat muutokset jotta Lukitus-luokkaa voitaisiin käyttä�
 
 \begin{javacode}
 class LaatikkoGameLogic2 implements AppLogic {
+  ...
   private Lukitus lukko = new Lukitus(new ArrayList<Key>());
   private boolean vaihdetaankoSalasana = false;
   private boolean vaihdetaanSalasanaa = false;
   private ArrayList<Key> uusiSalasana = new ArrayList<Key>();
   private boolean lukitaanko = false;
-
+  ...
   @Override
   public void tick() {
     ...
@@ -111,7 +112,6 @@ class LaatikkoGameLogic2 implements AppLogic {
     piirtoPinta.asetaPiilotus(lukko.onLukossa());
     ...
   }
-
   // käsittele näppäimen painallus
   @Override
   public void handleKey(Key k) {
@@ -120,53 +120,111 @@ class LaatikkoGameLogic2 implements AppLogic {
       lukko.tarkista(k);
     }
     else if(vaihdetaanSalasanaa) {
-         uusiSalasana.add(k);
-         if(k == Key.Backspace) {
-           uusiSalasana = new ArrayList<Key>();
-           System.out.println("Salasanan vaihto peruutettu.");
-           vaihdetaanSalasanaa = false;
-           vaihdetaankoSalasana = false;
-         }
-         if(k == Key.Enter) {
-           lukko.setCodeLukituskoodi(uusiSalasana);
-           uusiSalasana = new ArrayList<Key>();
-           System.out.println("Salasana vaihdettu.");
-           vaihdetaanSalasanaa = false;
-           vaihdetaankoSalasana = false;
-         }
-       }
-       else if(lukitaanko && k == Key.N) {
-         lukitaanko = false;
-         System.out.println("Lukitus peruutettiin.");
-        }
-       else if(lukitaanko && k == Key.Y) {
-         lukitaanko = false;
-         lukko.lukitse();
-         System.out.println("Lukittu.");
-       }
-       else if(vaihdetaankoSalasana && k == Key.N) {
-         vaihdetaankoSalasana = false;
-       }
-       else if(vaihdetaankoSalasana && k == Key.Y) {
-         vaihdetaanSalasanaa = true;
-         System.out.println("Anna uusi salasana merkki kerrallaan.");
-         System.out.println("Tallenna painamalla Enter.");
-         System.out.println("Peruuta painamalla Backspace.");
-       }
-       else if(k == Key.Space) {
-         System.out.println("Haluatko lukita ohjelman? Y/N");
-         lukitaanko = true;
-       }
-       else if(k == Key.Backspace) {
-         System.out.println("Nykyinen salasana:");
-         System.out.println(lukko.getCodeLukituskoodi());
-       }
-       else if(k == Key.Enter) {
-         System.out.println("Haluatko asettaa uuden salasanan? Y/N");
-         vaihdetaankoSalasana = true;
+      uusiSalasana.add(k);
+      if(k == Key.Backspace) {
+        uusiSalasana = new ArrayList<Key>();
+        System.out.println("Salasanan vaihto peruutettu.");
+        vaihdetaanSalasanaa = false;
+        vaihdetaankoSalasana = false;
+      }
+      if(k == Key.Enter) {
+        lukko.setCodeLukituskoodi(uusiSalasana);
+        uusiSalasana = new ArrayList<Key>();
+        System.out.println("Salasana vaihdettu.");
+        vaihdetaanSalasanaa = false;
+        vaihdetaankoSalasana = false;
        }
     }
+    else if(lukitaanko && k == Key.N) {
+      lukitaanko = false;
+      System.out.println("Lukitus peruutettiin.");
+    }
+    else if(lukitaanko && k == Key.Y) {
+      lukitaanko = false;
+      lukko.lukitse();
+      System.out.println("Lukittu.");
+    }
+    else if(vaihdetaankoSalasana && k == Key.N) {
+      vaihdetaankoSalasana = false;
+    }
+    else if(vaihdetaankoSalasana && k == Key.Y) {
+      vaihdetaanSalasanaa = true;
+      System.out.println("Anna uusi salasana merkki kerrallaan.");
+      System.out.println("Tallenna painamalla Enter.");
+      System.out.println("Peruuta painamalla Backspace.");
+    }
+    else if(k == Key.Space) {
+      System.out.println("Haluatko lukita ohjelman? Y/N");
+      lukitaanko = true;
+    }
+    else if(k == Key.Backspace) {
+      System.out.println("Nykyinen salasana:");
+      System.out.println(lukko.getCodeLukituskoodi());
+    }
+    else if(k == Key.Enter) {
+      System.out.println("Haluatko asettaa uuden salasanan? Y/N");
+      vaihdetaankoSalasana = true;
+    }
+  }
 }
 \end{javacode}
 
 Lukitusta voidaan hallita handleKey(Key k)-metodilla.
+
+\pagebreak
+
+\section{Testi-luokka (kohta d)}
+
+\label{Testi-luokka}
+
+En juuri tiedä, miten testiluokka tulisi tehdä Jqwikilla, joten teen sen JUnitilla. Ensin testataan oikealla salasanalla ja sitten uudelleen lukittuna väärällä.
+
+
+\begin{javacode}
+class Testi {
+  static Lukitus lukko;
+  static ArrayList<Key> salasana = new ArrayList<Key>();
+  @BeforeAll
+  static void setUpBeforeClass() throws Exception {
+    salasana.add(Key.T);
+    salasana.add(Key.E);
+    salasana.add(Key.S);
+    salasana.add(Key.T);
+    salasana.add(Key.I);
+    lukko = new Lukitus(salasana);
+    lukko.lukitse();
+  }
+  @Test
+  void test() {
+    lukko.tarkista(Key.T);
+    lukko.tarkista(Key.E);
+    lukko.tarkista(Key.S);
+    lukko.tarkista(Key.T);
+    lukko.tarkista(Key.I);
+    if(lukko.onLukossa()) {
+      fail("Salasana ei toiminut");
+    }
+    lukko.lukitse();
+    lukko.tarkista(Key.T);
+    lukko.tarkista(Key.E);
+    lukko.tarkista(Key.S);
+    lukko.tarkista(Key.Y);
+    lukko.tarkista(Key.I);
+    if(!lukko.onLukossa()) {
+      fail("Salasana toimi vaikkei pitänyt");
+    }
+  }
+}
+\end{javacode}
+
+\pagebreak 
+
+Testi ei tuottanut yhtään virhettä ja konsolin tulosteet näyttävät oikealta.
+
+\begin{javacode}
+Koodi on syötetty oikein.
+Nyt meni väärin. Aloita alusta.
+Nyt meni väärin. Aloita alusta.
+\end{javacode}
+
+Tekijänä Santeri Loitomaa (516587)
