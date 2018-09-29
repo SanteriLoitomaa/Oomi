@@ -3,206 +3,182 @@
 
 \section{a-kohta}
 \label{a-kohta}
-Loin data-abstraktioksi luokan Sudoku, jolla on ominaisuus kenttä. Kenttä on 9x9
-matriisi, joka automaattisesti sisältää int arvoja välillä 0-9 (defaultilla 0).
-Alla Sudoku luokan constructori.
+Luokka lopputeksti sisältää intit rivimäärällä ja max merkkimäärän, sen lisäksi String Arrayn jossa on
+kaikki kirjoitettava teksti. Luokassa on erikseen metodi yksittäisten rivien merkkimäärän tarkistukseen
+ja koko lopputeksti olion tarkastukseen. Näiden lisäksi on mukana metodit tekstin lukemiseen ja
+muokkaamiseen.
 \begin{javacode}
-/**
-   * Luo sudokuruudukko olion, jolla on ominaisuutena 9x9 matriisi kenttä.
-   * @.pre true
-   * @.post new Sudoku
-   */
-  public Sudoku(){
-    int[][] kenttä = new int [9][9];
+public class Lopputeksti {
+    int rivimäärä;
+    int merkkimäärä;
+    String[] sisältö;
+    
+    /**
+     * Luo lopputeksti luokan ja testaa onko sen sisältämä teksti liian pitkää yms.
+       ilmoittaen siitä jos näin on.
+     * @.pre r = int, m = int, s String[]
+     * @.post new Lopputeksti (&& Throw IndexOutOfBoundsException & virheilmoitus)
+     */
+    public Lopputeksti(int r, int m, String[] s) {
+      this.rivimäärä=r;
+      this.merkkimäärä=m;
+      this.sisältö=s;
+      rajoitteet(r,m,s);
+    }
+    /**
+     * Tarkistaa ja ilmoittaa onko lopputeksti haluttujen rajojen mukaista.
+     * @.pre r = int, m = int, s String[]
+     * @.post (IndexOutOfBoundsException & Ilmoitus virheestä)
+     */
+    public void rajoitteet(int rm, int mm, String[] syöte) {
+      for (int x=0;x<syöte.length;x++) {
+        if (riviTarkistus(syöte[x],mm) == false) {
+          try {
+            throw new IndexOutOfBoundsException();
+          } catch (IndexOutOfBoundsException i) {
+              System.out.println("Rivillä " + x+1 + ". on liian monta merkkiä!");
+          }
+        }
+      }
+      if (rm<syöte.length) {
+        try {
+          throw new IndexOutOfBoundsException();
+        } catch (IndexOutOfBoundsException i) {
+            System.out.println("Rivejä on liikaa!");
+        }
+      }
+    }
+    /**
+     * Tarkistaa rivin merkkimäärän, verraten sitä sallittuun maksimiin
+     * @p.pre tarkistettava = String, maksimi = int
+     * @.post return true || false
+     */
+    public boolean riviTarkistus(String tarkistettava, int maksimi) {
+      if (tarkistettava.length()>maksimi) {
+        return false;
+      }
+      return true;
+    }
+    /**
+     * Muokkaa annetun rivin tekstiä
+     * @.pre rivi = int, uusi = String
+     * @.post sisältö[rivi] = uusi;
+     */
+    public void tekstinMuokkaus(int rivi, String uusi ) {
+      sisältö[rivi] = uusi;
+    }
+    /**
+     * Palauttaa annetun rivin
+     * @.pre rivi = int
+     * @.post return sisältö[rivi];
+     */
+    public String tekstinLuku(int rivi) {
+      return sisältö[rivi];
+    }
   }
 \end{javacode}
-Luokka sisältää myös metodit lukujen katsomiseen tietyssä ruudussa ja lukujen lisäämiseen.
+
 
 
 \section{b-kohta}
 \label{b-kohta}
  
- metodi onSudoku() ottaa vastaan objektin ja kertoo sitten oikeellisesti onko kyseessä sudoku olio, koska olion
- kenttä on jo valmiiksi määritelty siten ettei se ota vastaan muuta kuin inttejä, niin kauan kun olio on sudoku
- on sen data myös oikeellinen.
+Luokkaan Lopputeksti lisättiin seuraavat kaksi metodia
 \begin{javacode}
 /**
-   * Tarkistaa että onko annettu objekti sudoku-data
-   * @.pre true
-   * @.post return true); || return false;
-   */
-  public static boolean onSudoku(Object o){
-      if (o instanceof Sudoku) {
-        return true;
-      }else {
-        return false;
+     * Siirtää piirrettävän tekstin y koordinaattia ja kutsuu komentoa piirrärivi
+     * @.pre true
+     * @.post Point c = new Point (p.x,(p.y + i*size)); &&
+     *        piirräRivi(piirtopinta, canvas,c,size, i);
+     */
+    public void piirräTeksti(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, Point p, int size) {
+      for (int i = 0; i<sisältö.length;i++) {
+        Point c = new Point (p.x,(p.y + i*size));
+        piirräRivi(piirtopinta, canvas,c,size, i);
       }
-  }
+      
+    }
+    /**
+     * Käy annetun tekstin kirjain kirjaimelta ja muuttaa x koordinaattia sopivasti,
+       kutsuen sitten drawText metodia.
+     * @.pre true
+     * @.post Point b = new Point ((p.x + i*size), p.y);
+          piirtopinta.drawText(canvas, b, l, size);
+     */
+    private void piirräRivi(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, Point p, int size, int row) {
+      for (int i=0; i<sisältö[row].length();i++) {
+        char l = sisältö[row].charAt(i);
+        Point b = new Point ((p.x + i*size), p.y);
+        piirtopinta.drawText(canvas, b, l, size);
+      }
+    }
 \end{javacode}
-
+Joiden avulla kutsutaan TextDraw metodia tekstin kirjoittamiseksi. Tämä testattiin DemoApp2 sisällä, luomalla
+testiolio Tekstipiirtopinnassa ja kutsumalla sitä drawForeGrounddContent sisältä. Lopputuloksena oli valmis
+teksti ruudulla.
+\begin{javacode}
+Point a = new Point(50,50);
+testi.piirräTeksti(this, canvas, a, koko);
+\end{javacode}
 
 \section{c-kohta}
 \label{c-kohta}
 
-Metodi sudokuTila aloittaa tarkistamalla onko kyseesäs sudoku, hypäten suoraan loppuun jo se ei ole. Metodi käy
-sitten systemaattisesti läpi eri vaihtoehdot, tarkistaen onko jokaisessa ruudussa eri luku kuin 0. Tutkien sitten
-jokaisen pyst ja vaakarivin ja ruudukon, varmistaen ettei sama luku esiinny kahdesti. Kaikista näistä printataan
-teksti joka kertoo lopputuloksen.
+Metodi piirräKirjainKerralla piirtää lopputeksti olion kirjaimia yksi kerrallaan. Ja lopettaa piirtämästä
+kun koko lopputeksti on päästy loppuun.
 \begin{javacode}
 /**
-   * Tarkistaa onko annettu objekti sudoku dataa, kertoo sen
-     jälkeen onko ruudukko oikein täytetty ja täysi.
-   * @.pre true
-   * @.post (System.out.println("Objekti on Sudoku"); ||
-     System.out.println("Objekti ei ole Sudoku");) &&
-     ( System.out.println("Sudoku on väärin täytetty"); ||
-     System.out.println("Sudoku on oikein täytetty");) &&
-     (System.out.println("Sudoku on täysi"); ||
-     System.out.println("Sudoku ei ole täysi"); )
-   */
-  public static void sudokuTila(Object o){
-    boolean täysi = true;
-    boolean oikein = true;
-    boolean brake = false;
-    if (o instanceof Sudoku) {
-        System.out.println("Objekti on Sudoku");
-        // tästä alkaa tarkistus onko sudoku
-         täytetty vai kesken
-        for (int x=0; x<9; x++) {
-          for (int y=0; y<9; y++) {
-            if (((Sudoku) o).kenttä[x][y]==0) {
-              täysi = false;
-            }
-          }
+     * Metodi ottaa annetuilla luvuilla kirjaimia lopputeksteistä ja kirjoittaa ne niille kuuluville kohdille.
+     * @.pre true
+     * @.post piirtopinta.drawText(canvas, point, letter, size);
+     */
+    public void piirräKirjainKerralla(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, int t, int size) {
+      int x = 0;
+      int a = t;
+      boolean kill = false;
+      while (a>=sisältö[x].length()) {
+        a= a-sisältö[x].length();
+        x++;
+        if (x>=sisältö.length) {
+          kill = true;
+          break;
         }
-        //Tästä alkaa tarkistus onko sudoku oikein
-        täytetty (vasta vaakarivit)
-        for (int luku=1;luku<10;luku++) {
-          for (int x=0; x<9; x++) {
-            int toistox = 0;
-            int toistoy = 0;
-            for (int y=0; y<9; y++) {
-              if (((Sudoku) o).kenttä[x][y]==luku) {
-                toistox ++;
-              }
-              if (((Sudoku) o).kenttä[y][x]==luku) {
-                toistoy ++;
-              }
-            }
-            if (brake){
-              break;
-            }
-            if (toistox>1 || toistoy>1) {
-              System.out.println("Sudoku on väärin
-              täytetty");
-              brake = true;
-            }
-          }
-          if (brake){
-            break;
-          }
-          for (int a=0;a<3;a++) {
-            for (int b=0;b<3;b++) {
-              int toistoz = 0;
-              for (int x=0;x<3;x++) {
-                for (int y=0;y<3;y++) {
-                  if (((Sudoku) o).kenttä[x+a*3]
-                  [y+b*3]==luku) {
-                    toistoz ++;
-                  }
-                  if (toistoz>1) {
-                    System.out.println("Sudoku
-                    on väärin täytetty");
-                    brake = true;
-                  }
-                  if (brake){
-                    break;
-                  }
-                }
-                if (brake){
-                  break;
-                }
-               }
-              if (brake){
-                break;
-              }
-            }
-            if (brake){
-              break;
-            }
-          }
-          if (brake){
-            break;
-          }
-        }
-        if (brake == false) {
-          System.out.println("Sudoku on oikein
-          täytetty");
-        }
-        if (täysi) {
-          System.out.println("Sudoku on täysi");
-        }else {
-          System.out.println("Sudoku ei ole täysi");
-        }
-      }else {
-        System.out.println("Objekti ei ole Sudoku");
       }
+      if (kill == false) {
+        char letter = sisältö[x].charAt(a);
+        Point point = new Point ((a*size+50),(x*size+50));
+        piirtopinta.drawText(canvas, point, letter, size);
+      }
+      
     }
 \end{javacode}
-Vaihtoehtoisesti luokka voisi sisältää booleanit täysi, oikein ratkaistu yms. ja printtaukset voisi silloin
-korvata booleanien muokkauksella.
+int t määritellään tickissä ja se kasvaa jokaisella tickin kutsulla, täten se käy lopputekstit läpi
+järjestyksessä. Olio itsessään luotiin tekstiGameLogicissa ja kutsuttiin tickissä.
 
+Luonti textGameLogicissa
+\begin{javacode}
+  private int i = 0;
+    String[] joku = new String[] {"moi","moi taas","abcdefghijklmnopqrs"};
+    Lopputeksti testi = new Lopputeksti(25,10,joku);
+\end{javacode}
+
+kutsu Tickissä
+\begin{javacode}
+testi.piirräKirjainKerralla(piirtoPinta, piirtoPinta.getGraphicsContext2D(), i, 24);
+\end{javacode}
+
+Kussakin "sarakkessa" ts. Stringissä on vain riville kirjoitettavat merkit, joten niissä ei ole ylimääräistä,
+toki jos rivin suorituksen haluaa kestävän kauemmin voi rivin loppuun lisätä välilyöntejä.
 \section{d-kohta}
 \label{d-kohta}
 
-Metodi sudokuKaanto, ottaa vastaan objekti, varmistaen aluksi onko kyseessä sudoku, sitten kääntää muuttujan kenttä
-lukujen paikkoja. Tarkentaisin tehtävänantoa määrityksellä siitä kumpaan suuntaan sudokua tulee kääntää.
-(tämä versio kääntää myötäpäivään.)
+Aiemman tehtävänannon metodi ei muutu, tickissä vain lineaarisesti kasvavan i:n sijasta arvotaan se Randomia
+hyväksikäyttäen. Antane lopputekstin kirjainten tulla satunnaisessa järjestyksessä.
 \begin{javacode}
-  /**
-   * Siirtää sudokun muuttujan kenttä lukujen paikkaa niin kuin
-     oliota käännettäisiin 90 astetta.
-   * @.pre true
-   * @.post s.kenttä[x][y] --> s.kenttä[8-y][x] ||
-     System.out.println("Objekti ei ole sudoku!");
-   */
-  public static void sudokuKaanto(Object s){
-    if(onSudoku(s)) {
-      Sudoku clone = new Sudoku();
-      for (int x=0;x<9;x++) {
-        for (int y=0;y<9;y++) {
-          clone.täytä(8-y,x,((Sudoku)s).kenttä[x][y]);
-        }
-      }
-      for (int x=0;x<9;x++) {
-        for (int y=0;y<9;y++) {
-          ((Sudoku)s).täytä(x,y,clone.kenttä[x][y]);
-        }
-      }
-    }else {
-      System.out.println("Objekti ei ole sudoku!");
-    }
-  }
+  Random r = new Random();
+      i = r.nextInt(30);
 \end{javacode}
 
-\section{e-kohta}
-\label{e-kohta}
 
-Testin onnistuminen on varma, koska sudokun kääntö ei muuta sudoku oliota toiseksi olioksi, vaan muuttaa lukuja sen
-muuttujassa.
-
-\begin{javacode}
-class FlipTest {
-
-  @RepeatedTest(value = 1000)
-  void test() {
-    Sudoku sudoku = new Sudoku();
-    T2.sudokuKaanto(sudoku);
-    assertTrue(T2.onSudoku(sudoku));
-  }
-
-}
-\end{javacode}
-Lopputulos 0 errors & 0 failures
 
 Tekijänä Tommi Heikkinen (517749)
