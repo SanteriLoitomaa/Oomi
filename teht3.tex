@@ -1,11 +1,20 @@
-/section{a}
+\chapter{Tehtävä 2 \label{chap:Teht=0000E4v=0000E4-2}}
+
+\section{a}
+
+\label{a}
+
 Tehtävänä oli kirjoittaa metodeille sanalliset kuvaukset ja sopimukset. Määrittely sopii kaiken kokoisiin väri matriiseihin.
-/section{b}
+
+\section{b}
+
+\label{b}
+
 Jos tehtävä tehtäisiin harvoja tietorakenteita tukevaksi koodi osat muuttuisivat suuresti,
 mutta määrittelyt eivät välttämättä ottaisi osaa muutokseen. Ei varattu muistialue palauttaisi joko null-arvon
 tai jonkin oletus värin esim. WHITE
 
-/begin{javacode}
+\begin{javacode}
 public class Grid {
 	
 	Color[][] ruudukko;
@@ -63,11 +72,16 @@ public class Grid {
 enum Color{
 	RED,BLUE,WHITE,PURPLE,BLACK,YELLOW;
 }
-/section{c & d}
+
+\end{javacode}
+
+\section{c & d}
+
+\label{c & d}
 Olen tehnyt peilaus ominaisuuden pääkoodiin ja junit testin alla olevaan koodiin. 
 
-/end{javacode}
-/begin{javacode}
+
+\begin{javacode}
 import java.util.Random;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -76,31 +90,31 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.TestInfo;
 
 public class GridTest {
-	
-@BeforeAll
-public static void init() {
-	System.out.println("Testing starts!");
+
+	@BeforeAll
+	public static void init() {
+		System.out.println("Testing starts!");
+	}
+	@AfterAll
+	public static void done() {
+		System.out.println("Testing done!");
+
+	}
+	@RepeatedTest(1000)
+	void repeatedTest(TestInfo testinfo){
+		Random r = new Random();
+		Grid g = new Grid();
+		Color c = Color.values()[new Random().nextInt(Color.values().length)];
+		int x = r.nextInt(9);
+		int y = r.nextInt(9);
+		g.writeCell(x, y, c);
+		Assertions.assertEquals(c,g.readCell(x, y));
+		Assertions.assertEquals(c,g.readCell(-x, y));
+		Assertions.assertEquals(c,g.readCell(x, -y));
+		Assertions.assertEquals(c,g.readCell(-x, -y));
+	}
 }
-@AfterAll
-public static void done() {
-	System.out.println("Testing done!");
-	
-}
-@RepeatedTest(1000)
-void repeatedTest(TestInfo testinfo){
-	Random r = new Random();
-	Grid g = new Grid();
-	Color c = Color.values()[new Random().nextInt(Color.values().length)];
-	int x = r.nextInt(9);
-	int y = r.nextInt(9);
-	g.writeCell(x, y, c);
-	Assertions.assertEquals(c,g.readCell(x, y));
-	Assertions.assertEquals(c,g.readCell(-x, y));
-	Assertions.assertEquals(c,g.readCell(x, -y));
-	Assertions.assertEquals(c,g.readCell(-x, -y));
-}
-}
-/end{javacode}
+\end{javacode}
 
 
 Tehnyt Janina Kuosmanen (516580)
