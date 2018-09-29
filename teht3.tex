@@ -1,120 +1,183 @@
-\chapter{Tehtävä 2 \label{chap:Teht=0000E4v=0000E4-2}}
+\chapter{Tehtävä 3 \label{chap:Teht=0000E4v=0000E4-2}}
 
-\section{a}
-
-\label{a}
-
-Tehtävänä oli kirjoittaa metodeille sanalliset kuvaukset ja sopimukset. Määrittely sopii kaiken kokoisiin väri matriiseihin.
-
-\section{b}
-
-\label{b}
-
-Jos tehtävä tehtäisiin harvoja tietorakenteita tukevaksi koodi osat muuttuisivat suuresti,
-mutta määrittelyt eivät välttämättä ottaisi osaa muutokseen. Ei varattu muistialue palauttaisi joko null-arvon
-tai jonkin oletus värin esim. WHITE
-
+\section{a-kohta}
+\label{a-kohta}
+Luokka lopputeksti sisältää intit rivimäärällä ja max merkkimäärän, sen lisäksi String Arrayn jossa on
+kaikki kirjoitettava teksti. Luokassa on erikseen metodi yksittäisten rivien merkkimäärän tarkistukseen
+ja koko lopputeksti olion tarkastukseen. Näiden lisäksi on mukana metodit tekstin lukemiseen ja
+muokkaamiseen.
 \begin{javacode}
-public class Grid {
-	
-	Color[][] ruudukko;
-	int width;
-	int height;
-	/**
-	 * Creates new Grid object
-	 * @.pre x>0 && y>0 
-	 * @.post new Grid 
-	 */
-	Grid(int x,int y){
-		ruudukko = new Color[x][y];
-		width = x;
-		height = y;
-	}
-	/**
-	 * palauttaa koordinaattien osoittaman ruudun värin
-	 * @.pre x<width(); && y<height();
-	 * @.post true
-	 */
-	Color readCell(int x, int y) {
-		return ruudukko[Math.abs(x)][Math.abs(y)];
-	}
-	
-	/**
-	 * sets color to given coordinates
-	 *  asettaa värin ruutuun 
-	 * @.pre x<width(); and y<height();
-	 * @.post ruudukko[x][y] == newColor
-	 */
-	void writeCell(int x, int y, Color newColor){
-		ruudukko[Math.abs(x)][Math.abs(y)] = newColor;
-	}
-	
-	/**
-	 * returns width of the grid
-	 * @.pre true
-	 * @.post true 
-	 */
-	int width() {
-		return width;
-	}
-	/**
-	 * returns height of the grid
-	 * @.pre true
-	 * @.post true
-	 */
-	int height() {
-		return height;
-	}
-
-
-
-}
-enum Color{
-	RED,BLUE,WHITE,PURPLE,BLACK,YELLOW;
-}
-
-\end{javacode}
-
-\section{c & d}
-
-\label{c & d}
-Olen tehnyt peilaus ominaisuuden pääkoodiin ja junit testin alla olevaan koodiin. 
-
-
-\begin{javacode}
-import java.util.Random;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.RepeatedTest; 
-import org.junit.jupiter.api.TestInfo;
-
-public class GridTest {
-
-	@BeforeAll
-	public static void init() {
-		System.out.println("Testing starts!");
-	}
-	@AfterAll
-	public static void done() {
-		System.out.println("Testing done!");
-
-	}
-	@RepeatedTest(1000)
-	void repeatedTest(TestInfo testinfo){
-		Random r = new Random();
-		Grid g = new Grid();
-		Color c = Color.values()[new Random().nextInt(Color.values().length)];
-		int x = r.nextInt(9);
-		int y = r.nextInt(9);
-		g.writeCell(x, y, c);
-		Assertions.assertEquals(c,g.readCell(x, y));
-		Assertions.assertEquals(c,g.readCell(-x, y));
-		Assertions.assertEquals(c,g.readCell(x, -y));
-		Assertions.assertEquals(c,g.readCell(-x, -y));
-	}
-}
+public class Lopputeksti {
+    int rivimäärä;
+    int merkkimäärä;
+    String[] sisältö;
+    
+    /**
+     * Luo lopputeksti luokan ja testaa onko sen sisältämä teksti liian pitkää yms.
+       ilmoittaen siitä jos näin on.
+     * @.pre r = int, m = int, s String[]
+     * @.post new Lopputeksti (&& Throw IndexOutOfBoundsException & virheilmoitus)
+     */
+    public Lopputeksti(int r, int m, String[] s) {
+      this.rivimäärä=r;
+      this.merkkimäärä=m;
+      this.sisältö=s;
+      rajoitteet(r,m,s);
+    }
+    /**
+     * Tarkistaa ja ilmoittaa onko lopputeksti haluttujen rajojen mukaista.
+     * @.pre r = int, m = int, s String[]
+     * @.post (IndexOutOfBoundsException & Ilmoitus virheestä)
+     */
+    public void rajoitteet(int rm, int mm, String[] syöte) {
+      for (int x=0;x<syöte.length;x++) {
+        if (riviTarkistus(syöte[x],mm) == false) {
+          try {
+            throw new IndexOutOfBoundsException();
+          } catch (IndexOutOfBoundsException i) {
+              System.out.println("Rivillä " + x+1 + ". on liian monta merkkiä!");
+          }
+        }
+      }
+      if (rm<syöte.length) {
+        try {
+          throw new IndexOutOfBoundsException();
+        } catch (IndexOutOfBoundsException i) {
+            System.out.println("Rivejä on liikaa!");
+        }
+      }
+    }
+    /**
+     * Tarkistaa rivin merkkimäärän, verraten sitä sallittuun maksimiin
+     * @p.pre tarkistettava = String, maksimi = int
+     * @.post return true || false
+     */
+    public boolean riviTarkistus(String tarkistettava, int maksimi) {
+      if (tarkistettava.length()>maksimi) {
+        return false;
+      }
+      return true;
+    }
+    /**
+     * Muokkaa annetun rivin tekstiä
+     * @.pre rivi = int, uusi = String
+     * @.post sisältö[rivi] = uusi;
+     */
+    public void tekstinMuokkaus(int rivi, String uusi ) {
+      sisältö[rivi] = uusi;
+    }
+    /**
+     * Palauttaa annetun rivin
+     * @.pre rivi = int
+     * @.post return sisältö[rivi];
+     */
+    public String tekstinLuku(int rivi) {
+      return sisältö[rivi];
+    }
+  }
 \end{javacode}
 
 
-Tehnyt Janina Kuosmanen (516580)
+
+\section{b-kohta}
+\label{b-kohta}
+ 
+Luokkaan Lopputeksti lisättiin seuraavat kaksi metodia
+\begin{javacode}
+/**
+     * Siirtää piirrettävän tekstin y koordinaattia ja kutsuu komentoa piirrärivi
+     * @.pre true
+     * @.post Point c = new Point (p.x,(p.y + i*size)); &&
+     *        piirräRivi(piirtopinta, canvas,c,size, i);
+     */
+    public void piirräTeksti(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, Point p, int size) {
+      for (int i = 0; i<sisältö.length;i++) {
+        Point c = new Point (p.x,(p.y + i*size));
+        piirräRivi(piirtopinta, canvas,c,size, i);
+      }
+      
+    }
+    /**
+     * Käy annetun tekstin kirjain kirjaimelta ja muuttaa x koordinaattia sopivasti,
+       kutsuen sitten drawText metodia.
+     * @.pre true
+     * @.post Point b = new Point ((p.x + i*size), p.y);
+          piirtopinta.drawText(canvas, b, l, size);
+     */
+    private void piirräRivi(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, Point p, int size, int row) {
+      for (int i=0; i<sisältö[row].length();i++) {
+        char l = sisältö[row].charAt(i);
+        Point b = new Point ((p.x + i*size), p.y);
+        piirtopinta.drawText(canvas, b, l, size);
+      }
+    }
+\end{javacode}
+Joiden avulla kutsutaan TextDraw metodia tekstin kirjoittamiseksi. Tämä testattiin DemoApp2 sisällä, luomalla
+testiolio Tekstipiirtopinnassa ja kutsumalla sitä drawForeGrounddContent sisältä. Lopputuloksena oli valmis
+teksti ruudulla.
+\begin{javacode}
+Point a = new Point(50,50);
+testi.piirräTeksti(this, canvas, a, koko);
+\end{javacode}
+
+\section{c-kohta}
+\label{c-kohta}
+
+Metodi piirräKirjainKerralla piirtää lopputeksti olion kirjaimia yksi kerrallaan. Ja lopettaa piirtämästä
+kun koko lopputeksti on päästy loppuun.
+\begin{javacode}
+/**
+     * Metodi ottaa annetuilla luvuilla kirjaimia lopputeksteistä ja kirjoittaa ne niille kuuluville kohdille.
+     * @.pre true
+     * @.post piirtopinta.drawText(canvas, point, letter, size);
+     */
+    public void piirräKirjainKerralla(TekstiPiirtopinta piirtopinta, GraphicsContext canvas, int t, int size) {
+      int x = 0;
+      int a = t;
+      boolean kill = false;
+      while (a>=sisältö[x].length()) {
+        a= a-sisältö[x].length();
+        x++;
+        if (x>=sisältö.length) {
+          kill = true;
+          break;
+        }
+      }
+      if (kill == false) {
+        char letter = sisältö[x].charAt(a);
+        Point point = new Point ((a*size+50),(x*size+50));
+        piirtopinta.drawText(canvas, point, letter, size);
+      }
+      
+    }
+\end{javacode}
+int t määritellään tickissä ja se kasvaa jokaisella tickin kutsulla, täten se käy lopputekstit läpi
+järjestyksessä. Olio itsessään luotiin tekstiGameLogicissa ja kutsuttiin tickissä.
+
+Luonti textGameLogicissa
+\begin{javacode}
+  private int i = 0;
+    String[] joku = new String[] {"moi","moi taas","abcdefghijklmnopqrs"};
+    Lopputeksti testi = new Lopputeksti(25,10,joku);
+\end{javacode}
+
+kutsu Tickissä
+\begin{javacode}
+testi.piirräKirjainKerralla(piirtoPinta, piirtoPinta.getGraphicsContext2D(), i, 24);
+\end{javacode}
+
+Kussakin "sarakkessa" ts. Stringissä on vain riville kirjoitettavat merkit, joten niissä ei ole ylimääräistä,
+toki jos rivin suorituksen haluaa kestävän kauemmin voi rivin loppuun lisätä välilyöntejä.
+\section{d-kohta}
+\label{d-kohta}
+
+Aiemman tehtävänannon metodi ei muutu, tickissä vain lineaarisesti kasvavan i:n sijasta arvotaan se Randomia
+hyväksikäyttäen. Antane lopputekstin kirjainten tulla satunnaisessa järjestyksessä.
+\begin{javacode}
+  Random r = new Random();
+      i = r.nextInt(30);
+\end{javacode}
+
+
+
+Tekijänä Tommi Heikkinen (517749)
