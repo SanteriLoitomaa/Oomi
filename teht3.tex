@@ -1,188 +1,108 @@
-\chapter{Tehtävä 3 \label{chap:Teht=0000E4v=0000E4-3}}
+\chapter{Tehtävä 3: Gorilla -peli \label{chap:Teht=0000E4v=0000E4-2}}
 
-\section{a-kohta}
-\label{a-kohta}
-Luokka lopputeksti sisältää intit rivimäärällä ja max merkkimäärän, sen lisäksi
-String Arrayn jossa on kaikki kirjoitettava teksti. Luokassa on erikseen metodi
-yksittäisten rivien merkkimäärän tarkistukseen ja koko lopputeksti olion
-tarkastukseen. Näiden lisäksi on mukana metodit tekstin lukemiseen ja muokkaamiseen.
-\begin{javacode}
-public class Lopputeksti {
-    int rivimäärä;
-    int merkkimäärä;
-    String[] sisältö;
-    
-    /**
-     * Luo lopputeksti luokan ja testaa onko sen sisältämä teksti liian pitkää yms.
-       ilmoittaen siitä jos näin on.
-     * @.pre r = int, m = int, s String[]
-     * @.post new Lopputeksti (&& Throw IndexOutOfBoundsException & virheilmoitus)
-     */
-    public Lopputeksti(int r, int m, String[] s) {
-      this.rivimäärä=r;
-      this.merkkimäärä=m;
-      this.sisältö=s;
-      rajoitteet(r,m,s);
-    }
-    /**
-     * Tarkistaa ja ilmoittaa onko lopputeksti haluttujen rajojen mukaista.
-     * @.pre r = int, m = int, s String[]
-     * @.post (IndexOutOfBoundsException & Ilmoitus virheestä)
-     */
-    public void rajoitteet(int rm, int mm, String[] syöte) {
-      for (int x=0;x<syöte.length;x++) {
-        if (riviTarkistus(syöte[x],mm) == false) {
-          try {
-            throw new IndexOutOfBoundsException();
-          } catch (IndexOutOfBoundsException i) {
-              System.out.println("Rivillä " + x+1 + ". on liian monta merkkiä!");
-          }
-        }
-      }
-      if (rm<syöte.length) {
-        try {
-          throw new IndexOutOfBoundsException();
-        } catch (IndexOutOfBoundsException i) {
-            System.out.println("Rivejä on liikaa!");
-        }
-      }
-    }
-    /**
-     * Tarkistaa rivin merkkimäärän, verraten sitä sallittuun maksimiin
-     * @p.pre tarkistettava = String, maksimi = int
-     * @.post return true || false
-     */
-    public boolean riviTarkistus(String tarkistettava, int maksimi) {
-      if (tarkistettava.length()>maksimi) {
-        return false;
-      }
-      return true;
-    }
-    /**
-     * Muokkaa annetun rivin tekstiä
-     * @.pre rivi = int, uusi = String
-     * @.post sisältö[rivi] = uusi;
-     */
-    public void tekstinMuokkaus(int rivi, String uusi ) {
-      sisältö[rivi] = uusi;
-    }
-    /**
-     * Palauttaa annetun rivin
-     * @.pre rivi = int
-     * @.post return sisältö[rivi];
-     */
-    public String tekstinLuku(int rivi) {
-      return sisältö[rivi];
-    }
-  }
-\end{javacode}
+\section{Peliä kuvaavat luokkakokonaisuudet (a,b)}
 
+\label{Peliä kuvaavat luokkakokonaisuudet (a,b)}
 
+Kuvausten ja tehtävien pohjalta on tehty luokkakaavio kuvassa \ref{Gorilla},
+jolla pyrin kuvaamaan lopullista peliä. Luokkakaaviossa on olioiden hierarkian
+lisäksi kuvattu niiden määräsuhteita ja abstraktit luokat on merkitty sinisen
+sijaan valkoisella pohjalla.
 
-\section{b-kohta}
-\label{b-kohta}
- 
-Luokkaan Lopputeksti lisättiin seuraavat kaksi metodia
-\begin{javacode}
-/**
-     * Siirtää piirrettävän tekstin y koordinaattia ja kutsuu komentoa piirrärivi
-     * @.pre true
-     * @.post Point c = new Point (p.x,(p.y + i*size)); &&
-     *        piirräRivi(piirtopinta, canvas,c,size, i);
-     */
-    public void piirräTeksti(TekstiPiirtopinta piirtopinta, GraphicsContext
-    canvas, Point p, int size) { for (int i = 0; i<sisältö.length;i++) {
-        Point c = new Point (p.x,(p.y + i*size));
-        piirräRivi(piirtopinta, canvas,c,size, i);
-      }
-      
-    }
-    /**
-     * Käy annetun tekstin kirjain kirjaimelta ja muuttaa x koordinaattia sopivasti,
-       kutsuen sitten drawText metodia.
-     * @.pre true
-     * @.post Point b = new Point ((p.x + i*size), p.y);
-          piirtopinta.drawText(canvas, b, l, size);
-     */
-    private void piirräRivi(TekstiPiirtopinta piirtopinta, GraphicsContext
-    canvas, Point p, int size, int row) { for (int i=0; i <
-    sisältö[row].length(); i++) { char l = sisältö[row].charAt(i); Point b = new
-    Point ((p.x + i*size), p.y); piirtopinta.drawText(canvas, b, l, size);
-      }
-    }
-\end{javacode}
-Joiden avulla kutsutaan TextDraw metodia tekstin kirjoittamiseksi. Tämä
-testattiin DemoApp2 sisällä, luomalla testiolio Tekstipiirtopinnassa ja
-kutsumalla sitä drawForeGrounddContent sisältä. Lopputuloksena oli valmis
-teksti ruudulla.
-\begin{javacode}
-Point a = new Point(50,50);
-testi.piirräTeksti(this, canvas, a, koko);
-\end{javacode}
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/GorillaPeli}
+\caption{Luokkakaavio Gorilla-Pelistä}
+\label{Gorilla} 
+\end{figure}
 
-\section{c-kohta}
-\label{c-kohta}
+Kuvasta \ref{Gorilla} on jätetty selkeyden vuoksi merkitsemättä luokat vektori,
+osumalaatikko ja rajapinnat aktiivinen, piirrettävä, heitettävä ja kerättävä.
+Nämä kaikki luokat voidaan jakaa suunnittelu, analyysi ja toteutusluokkiin (kts
+\ref{Gorillajako}), jossa suunnitteluluokkiin kuuluu pääasiassa abstrakteja
+luokkia. Analyysiluokista löytyy pelin rakenteeseen liittyviä luokkia ja
+tuuli-luokka jota ei ruudulla suoraan näe vaan liittyy enemmän pelimoottorin
+toimintaan.
 
-Metodi piirräKirjainKerralla piirtää lopputeksti olion kirjaimia yksi
-kerrallaan. Ja lopettaa piirtämästä kun koko lopputeksti on päästy loppuun.
-\begin{javacode}
-/**
-     * Metodi ottaa annetuilla luvuilla kirjaimia lopputeksteistä ja kirjoittaa
-     ne niille kuuluville kohdille.
-     * @.pre true
-     * @.post piirtopinta.drawText(canvas, point, letter, size);
-     */
-    public void piirräKirjainKerralla(TekstiPiirtopinta piirtopinta,
-    GraphicsContext canvas, int t, int size) { 
-      int x = 0;
-      int a = t;
-      boolean kill = false;
-      while (a>=sisältö[x].length()) {
-        a= a-sisältö[x].length();
-        x++;
-        if (x>=sisältö.length) {
-          kill = true;
-          break;
-        }
-      }
-      if (kill == false) {
-        char letter = sisältö[x].charAt(a);
-        Point point = new Point ((a*size+50),(x*size+50));
-        piirtopinta.drawText(canvas, point, letter, size);
-      }
-      
-    }
-\end{javacode}
-int t määritellään tickissä ja se kasvaa jokaisella tickin kutsulla, täten se
-käy lopputekstit läpi järjestyksessä. Olio itsessään luotiin tekstiGameLogicissa
-ja kutsuttiin tickissä.
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/GorillaLuokat}
+\caption{Suunnittelu-, analyysi ja toteutusluokkiin jako}
+\label{Gorillajako} 
+\end{figure}
 
-Luonti textGameLogicissa
-\begin{javacode}
-  private int i = 0;
-    String[] joku = new String[] {"moi","moi taas","abcdefghijklmnopqrs"};
-    Lopputeksti testi = new Lopputeksti(25,10,joku);
-\end{javacode}
+Toteutusluokista löytyy selkeitä käsitteitä, joita pelissä nähdään visuaalisina
+elementteinä ja näitä näkyviä olioita yhdistää myös rajapinta Piirrettävä, joka
+määrittelee millaiset metodit tulee luokasta löytyä, että se voidaan piirtää
+ruudulle. Aktiivisten luokkien oliot ovat sellaisia, joille löytyy oma
+päivitysmetodi mikä toteutetaan jokaisen tick() -metodin tai toisin sanoen
+jokaisen pelin päivitysiteraation aikana. 
 
-kutsu Tickissä
-\begin{javacode}
-testi.piirräKirjainKerralla(piirtoPinta, piirtoPinta.getGraphicsContext2D(), i, 24);
-\end{javacode}
+Esineet ovat kerättäviä asioita pelikentiltä, jotka voisivat olla esimerkiksi
+pisteitä, lisä elämiä tai banaaneja, joita voi heitellä toisten pelaajien niskaan. Itse rajapinta
+Heitettävä kuvaa kaikkia olioita, joita pelaaja voi singota omalla gorillallaan.
+Nämä kaikki rajapinnat kuvaavat pelissä tapahtuvia vuorovaikuttavia elementtejä,
+mutta sen lisäksi tarvitaan koristeita, jotka tuovat pelin taustaksi grafiikkaa
+ja mallintavat selkeästi pelaajalle missä rakennukset peliruudulla ovat.
 
-Kussakin "sarakkessa" ts. Stringissä on vain riville kirjoitettavat merkit,
-joten niissä ei ole ylimääräistä, toki jos rivin suorituksen haluaa kestävän
-kauemmin voi rivin loppuun lisätä välilyöntejä.
-\section{d-kohta}
-\label{d-kohta}
+\section{Pakettikokonaisuudet ja uudelleenkäytettävyys (c, d)}
 
-Aiemman tehtävänannon metodi ei muutu, tickissä vain lineaarisesti kasvavan i:n
-sijasta arvotaan se Randomia hyväksikäyttäen. Antane lopputekstin kirjainten
-tulla satunnaisessa järjestyksessä.
-\begin{javacode}
-  Random r = new Random();
-      i = r.nextInt(30);
-\end{javacode}
+\label{Pakettikokonaisuudet ja uudelleenkäytettävyys (c, d)}
 
+Kuvan \ref{Gorilla} luokkia voidaan jakaa ryhmiin, jotka kuvaavat
+pääsääntöisesti jotain pelin osa-aluetta niin, että vuorovaikutukset ryhmän
+sisällä on suurempaa kuin ryhmien välillä. Ryhmät voitaisiin nimetä paketeiksi
+seuraavalla tavalla:
 
+\begin{itemize}
+\item \underline{Player} (\underline{Pelaaja}, \underline{Ohjain})
+\item \underline{Engine} (\underline{Kenttä}, \underline{Kappale},
+\underline{Maa}, \underline{Esine})
+\item Map (Rakennus, Ikkuna)
+\item Character (Banaani, Gorilla)
+\item Graphics (Aurinko, Taivas)
+\item \underline{Menu} (\underline{Peli})
+\end{itemize}
 
-Tekijänä Tommi Heikkinen (517749)
+Player-paketissa olisi työkaluja pelaajien ja pelaajien käyttämien ohjainten
+hallintaan. Engineä pystytään uudelleenkäyttämään, kun halutaan tehdä
+samanlaiseen pelimekaniikkaan liittyvä peli tai modi. Menu-pakettilla voidaan
+muodostaa toinen moninpeli, jossa 1-4 pelaajaa kamppailee toisiaan vastaan
+erissä, joiden pisteitä lasketaan. Map, Character, Graphics paketit liittyvät
+tiiviisti pelin ulkonäköön ja olemukseen, joten muita pelejä tehdessä näitä
+paketteja tuskin pystyy paljon käyttämään hyväksi.
+
+\section{Fysiikan mallinnuksen soveltaminen (e)}
+
+\label{Fysiikan mallinnuksen soveltaminen (e)}
+
+Fysiikanmallinnuksen soveltaminen pelimoottoriin voidaan tehdä monella tavalla
+ja se riippuu pääsääntöisesti pelistä. Joissain arcade -peleissä fysiikan lakeja
+halutaan venyttää ja muokata niin, että pelikokemus on viihdyttävämpi. Tässä
+tapauksessa voimille ja kentille voi tehdä omat oliot, jolloin pelin logiikan
+kehityksessä näitä voimia tai impulsseja voidaan säätää yliampuviksi tarpeen
+mukaan.
+
+Jos pelissä on kyseessä enemmän simulointi, jossa halutaan, että samat fysiikan
+lait pätevät kaikkialla pelikentällä kaikille olioille, niin esimerkiksi
+Painovoima, Voima ja Impulssi -olioiden tekeminen on turhaa. Fysiikan lait
+pystytään silloin kuvaamaan esimerkiksi kuvan \ref{Gorilla} kaltaisessa
+luokkahierarkiassa pelkästään Kappale -luokan sisällä, jolloin yksikään
+aliluokka tai olio ei pysty tästä säännöstä poikkeamaan.
+
+Esimerkiksi painovoiman, tai pikemminkin normaalikiihtyvyyden suuruus voitaisiin
+määrätä final static -muodossa vektoriksi, jolloin kaikki kappaleet pelissä
+joutuisivat sitä noudattamaan. Normaalikiihtyvyyden vektori kannattaisi pitää
+vähintään static -muotoisena, jolloin jos maan painovoimakentästä siirryttäisiin
+kuun painovoimaan, niin kaikki pelialueen oliot välittömästi päivittyisivät
+tähän. Pelimoottori ei näytä välttämättä eheältä, jos jotkin kappaleet liikkuvat
+kuin `eri planeetalla`.
+
+Voima tai Painovoima -luokista luopuminen ei kumminkaan tarkoita sitä, että
+pelimoottorin mekaniikan toteuttavissa metodeissa nämä käsitteet ei tarvitsisi
+olla hyvin dokumentoituja. Päinvastoin: metodien toteutuksessa tulee nimetä
+hyvin selkeästi milloin on kyse kiihtyvyydestä, milloin voimasta tai milloin
+liiketilasta. Dokumentaatiossa kannattaa myös merkitä, että mikä rivi toteuttaa
+minkäkin fysiikan lain: Newtonin lait, Galileon suhteellisuus, voimien
+resultanttivektorin summaus ja jotta fysiikan mallinnuksen tuottava algoritmi on
+selkeästi luettavissa.
+
+Tekijänä Pasi Toivanen (517487)
