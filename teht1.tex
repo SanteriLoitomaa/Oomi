@@ -1,8 +1,9 @@
 
-\chapter{Tehtävä 1 \label{chap:Teht=0000E4v=0000E4-1}}
+\chapter{Tehtävä 1: Mato pelin mallinnus \label{chap:Teht=0000E4v=0000E4-1}}
+
 
 Tehtävänä oli malintaa kolme matopelin tapausta käyttötapauskaavioilla
-\section{Mato pelin mallinnus}
+\section{Maton liikkuminen}
 
 \label{Madon liikkuminen}
 
@@ -15,6 +16,7 @@ niin että jokainen hännän osa saa koordinaateiksi sitä edeltävän osan vanh
 \label{Liikkuminen} 
 \end{figure}
 
+\section{Evään syönti}
 \label{Evään syönti}
 Kun madon pään koordinaatit ovat samat kuin evään, eväs syödään eli poistetaan kehyksestä. Mato saa pisteitä eväältä ja sen häntä kasvaa yhden pykälän. Uusi eväs asetetaan jonnekin kehykseen. 
 
@@ -22,7 +24,7 @@ Kun madon pään koordinaatit ovat samat kuin evään, eväs syödään eli pois
 \centering \includegraphics[width=0.5\textwidth]{kuvat/SnakeGame2}
 \label{Syönti} 
 \end{figure}
-
+\section{Törmäys}
 \label{Törmäys}
 Jos mato osuu kehyksen seinään se menettää pituutta ja pysähtyy kunnes sille annetaan uusi suunta. 
 \begin{figure}
