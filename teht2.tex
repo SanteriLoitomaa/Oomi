@@ -3,283 +3,75 @@
 
 \section{a-kohta}
 \label{a-kohta}
-Loin uuden MatoPelaaja luokan, jonne tallentuu pelaajan pisteet kokonaislukuna,
-nimi lukujonona,väri javafx Color-oliona ja sen hetkinen pituus myös
-kokonaislukuna. Luokasta löytyy metodit pisteiden ja pituuden muuttamiseen.
-\section{a-kohta}
-\label{a-kohta}
-Loin myös MatoNäkymä luokan jonka avulla mato piiretään peliin. Luokassa on madon
-pää erikseen pisteenä ja loppu mato ArrayListissa ja tietää nykyisen suunnan.
-
-Käytin tehtävässä pohjana valmista pohjakoodia jota olen muutellut jonkin verran.
-
+Määrittelyn muutoksen aloittaisin metodista lisääSolmu, koska solmuja ei enää
+luoda irrallisina vaan osana muita prosesseja, voi sen tyypin vaihtaa privateksi.
 \begin{javacode}
-package fi.utu.oomkit.examples.emptyapp;
-
-
-
-import fi.utu.oomkit.AppConfiguration;
-import fi.utu.oomkit.AppLogic;
-import fi.utu.oomkit.gui.MainWindow;
-import fi.utu.oomkit.gui.OOMApp;
-import fi.utu.oomkit.gui.SimpleCanvas;
-import fi.utu.oomkit.util.Point;
-import fi.utu.oomkit.util.KeyHandler.Key;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyEvent;
-import java.awt.event.*;
-
 /**
- * LaatikkoPiirtopinta. Käyttöliittymä huolehtii teknisestä toteutuksesta.
- * @see this.redraw() Piirrä uudestaan, riittää kutsua vain kun sisältö muuttuu.
- * @see this.drawForegroundContent(canvas) piirtää "edustan"
- * @see this.drawBackgroundContent(canvas) piirtää "taustan", oletus: täysin
- * valkoinen */
-class LaatikkoPiirtopinta extends SimpleCanvas {
-    private final int koko = 12;
-    private Point piste;
-    private MatoNäkymä mauno;
-
-    LaatikkoPiirtopinta() { super(true);
-    mauno=new MatoNäkymä();}
-
-    // asettaa piirrettävän pisteen
-    void asetaPiste(Point piste) {
-        this.piste = piste;
-    }
-
-    // piirtää pisteen p size-kokoisena neliönä, vas. yläreuna = p
-    private void drawRectangle(GraphicsContext canvas, Point p, int size) {
-        canvas.setFill(javafx.scene.paint.Color.DARKBLUE);
-        canvas.fillRect(p.x, p.y, size, size);
-        
-        
-    }
-
-    // piirrä piste, jos koordinaatti olemassa (piste != null)
-    protected void drawForegroundContent(GraphicsContext canvas) {
-        if (piste != null) {
-        	drawRectangle(canvas, piste, koko);
-        	}
-        if(mauno!=null) {
-        	mauno.draw(canvas);
-        }
-    }
-}
-
-class LaatikkoGameLogic implements AppLogic {
-    final LaatikkoPiirtopinta piirtoPinta = new LaatikkoPiirtopinta();
-    private final int reuna = 25;
-
-    private int liikkeenTila = 0;
-    private Point piste = new Point(reuna, reuna);
-    private MatoNäkymä mauno = new MatoNäkymä();
-    Point pää = mauno.getPää();
-  
-
-    // alustaa pelin logiikan, päivitys 20ms välein
-    @Override
-    public AppConfiguration configuration() {
-        return new AppConfiguration(20, "Demo", false);
-    }
-
-    @Override
-    public void tick() {
-        double max_x = piirtoPinta.getWidth() - reuna;
-        double max_y = piirtoPinta.getHeight() - reuna;
-        switch (mauno.AnnaSuunta()) {
-       
-            case 'D':
-            	
-                if (piste.x < max_x) {
-                	piste = piste.add(5, 0);
-                }
-                
-                
-                
-                break;
-            case 'S':
-                if (piste.y < max_y)
-                    piste = piste.add(0, 5);
-                
-                break;
-            case 'A':
-                if (piste.x > reuna)
-                    piste = piste.add(-5, 0);
-                
-                break;
-            case 'W':
-            	
-                if (piste.y > reuna)
-                    piste = piste.add(0, -5);
-                break;
-        }
-        
-        piirtoPinta.asetaPiste(mauno.getPää());
-        piirtoPinta.asetaPiste(piste);
-        piirtoPinta.redraw();
-    }
-
-public void Törmäys() {
-	if(piste.x==mauno.getPää().x && piste.y==mauno.getPää().y) {
-		piirtoPinta.asetaPiste( Point.generateRandomPoint(
-		(int)piirtoPinta.getWidth(), (int)piirtoPinta.getHeight() ) ); 
-	} if() }
-
-public void handleKey(Key k) {
-	if(k.equals(Key.A)) {
-		piste = piste.add(-5,0);
-		mauno.vaihdaSuunta('A');
-	}
-	if(k.equals(Key.W)) {
-		piste = piste.add(0,-5);
-		mauno.vaihdaSuunta('W');
-	}
-	if(k.equals(Key.D)) {
-		piste = piste.add(5,0);
-		mauno.vaihdaSuunta('D');
-	}
-	if(k.equals(Key.S)) {
-		piste = piste.add(0,5);
-		mauno.vaihdaSuunta('S');
-	}
-	System.out.println(k + " pressed!"); 
-}
-}
-
-
-public class DemoApp1 extends OOMApp {
-    // alustaa pelilogiikan
-    final static LaatikkoGameLogic gameLogic = new LaatikkoGameLogic();
-
-    // kytkee piirtopinnan käyttöliittymään
-    @Override
-    protected MainWindow generateMainWindow(String appName, double width, double height) {
-        return new SimpleMainWindow(appName, width, height) {
-            @Override public SimpleCanvas mainContent() {
-                return gameLogic.piirtoPinta;
-            }
-        };
-    }
-
-    // alustaa demo-ohjelman (käyttöliittymä)
-    public DemoApp1() {
-        super(gameLogic);
-    }
-
-    // alustaa demo-ohjelman (JavaFX)
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-}
+* @.pre leima != null && !sisältääSolmun(leima)
+* @.post RESULT.sisältääSolmun(leima) &
+* RESULT.poistaSolmu(leima).equals(this)
+*/
+private lisääSolmu(String leima)
 \end{javacode}
+Vaihtoehtoisesti tyypin voi pitää publicina, jos metodia kuitenkin haluaa luokan
+ulkopuolelta kutsua.
 
-\section{c-kohta}
-\label{c-kohta}
-MatoPelaajan koodi.
-\begin{javacode}
-package fi.utu.oomkit.examples.emptyapp;
-
-import javafx.scene.paint.Color;
-
-public class MatoPelaaja {
-	
-	private int pistesumma;
-	private String nimi;
-	 Color väri;
-	private int pituus ;
-	
-	public MatoPelaaja(String nimi) {
-		this.nimi=nimi;
-		pituus = 5;
-		väri = Color.GOLD;
-	}
-	public void addPoints(int p) {
-		pistesumma = pistesumma+p;
-	}
-	public void muutaPituus(int p) {
-		pituus += p;
-	}
-
-}
-
-\end{javacode}
-
-\section{d-kohta}
-\label{d-kohta}
-
-MatoNäkymän Koodi.
+Tärkeämpi osuus on muuttaa SuunnattuGraafi luokan constructoria siten, että
+uutta graafia luodessa pitää sille antaa syötteenä luotava solmu, josta
+rakentaminen lähtee liikkeelle (ns. juurisolmu).
 
 \begin{javacode}
-package fi.utu.oomkit.examples.emptyapp;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-
-import fi.utu.oomkit.util.KeyHandler;
-import fi.utu.oomkit.util.Point;
-import javafx.scene.canvas.GraphicsContext;
-import fi.utu.oomkit.util.KeyHandler.Key;
-
-//Luokka Madon piirtämisen avuksi
-public class MatoNäkymä   {
-	private Point pää;
-	ArrayList<Point> häntä;
-	protected char suunta;
-	protected MatoPelaaja mauno = new MatoPelaaja("Mauno Matonen");
-	
-	public MatoNäkymä() {
-		pää = new Point(100,25);
-		suunta = 'D';
-		häntä = new ArrayList<Point>();
-		while(häntä.size()<5) {
-			häntä.add(new Point(100-15*häntä.size(),25));}
-		
-	}
-	public boolean törmäys(Point p) {
-		if(pää.equals(p)) {
-
-			int x = häntä.get(häntä.size()-1).x;
-			int y = häntä.get(häntä.size()-1).y;
-			häntä.add(new Point(x-15,y-15));
-			return true;
-		}else if(häntä.contains(p)) {return true;}
-		else if(häntä.contains(pää)) {return true;}
-		return false;
-		}
-	public Point getPää() {
-		return pää;
-	}
-	public void setPää(Point pää) {
-		this.pää=pää;
-	}
-	public void vaihdaSuunta(char c) {
-		suunta = c;
-	}
-	public char AnnaSuunta() {
-		return suunta;
-	}
-	
-	public void draw(GraphicsContext canvas) {
-		canvas.setFill(mauno.väri);
-        canvas.fillRect(pää.x, pää.y, 12, 12);
-        for(Point p : häntä) {
-        	canvas.setFill(mauno.väri);
-            canvas.fillRect(p.x, p.y, 12, 12);
-        }
-	}
-
-}
-
-
+/**
+* @.pre juuri != null
+* @.post solmumäärä() == 1 & kaarimäärä() == 0 &
+*        RESULT.sisältääSolmun(juuri) &
+*        RESULT.poistaSolmu(juuri).equals(this)
+*/
+public SuunnattuGraafi(String juuri)
 \end{javacode}
+Konstruktori siis kutsuu aiemmin muokattua lisääSolmu(leima) metodia ja luo
+sen pohjalta juurisolmun.
+
+Uuden kaaren lisäämisessä pitää huomioida, että kohdejuuren ei ole pakko olla vielä
+olemassa, vaan se voidaan luoda kaaren yhteydessä, mutta muita muutoksia metodi ei
+juuri vaadi.
+\begin{javacode}
+/**
+* @.pre (lähtöleima != null & tuloleima != null) &&
+* sisältääSolmun(lähtöleima) & !sisältääKaaren(lähtöleima, tuloleima)
+* @.post RESULT.sisältääKaaren(lähtöleima, tuloleima) &
+* RESULT.poista(lähtöleima, tuloleima).equals(this) &
+* RESULT.annaPaino(lähtöleima, tuloleima) == paino &
+* if(!sisältääSolmun(tuloleima))  RESULT.sisältääSolmun(tuloleima) &
+*                                 RESULT.poistaSolmu(tuloleima).equals(this)
+*/
+public SuunnattuGraafi lisääKaari(String lähtöleima, String tuloleima,
+double paino)
+\end{javacode}
+Jos tuloleima nimistä solmua ei ole vielä olemassa metodi luo sellaisen, jatkaen
+sitten toimintaansa normaalisti. Jos solmu on jo olemassa toiminta ei eroa aiemmasta.
 
 
+\section{b-kohta}
+\label{b-kohta}
+Luokan SuunnattuGraafi nimi kannattaisi alkajaisiksi muuttaa, esim. SuunnatonGraafi,
+vastaavasti kaikki metodit jotka viittaavat tähän nimeen yms. tulisi muuttaa viitaamaan
+uuteen nimeen. Terminologian selkeyttämiseksi vaihtaisin myös muuttujat lähtöleima ja
+tuloleima, vaikkapa korvaaviksi päätysolmu1 ja päätysolmu2, kuvastamaan ettei ole alkua
+ja loppua vaan kaaren kaksi päätyä.
+
+Terminologian muutosten lisäksi on luokassa vain kaksi metodia jotka ovat kiinnostuneita
+kaaren edeltäjist ja seuraajista, metodit Solmujoukko edeltjät & Solmujoukko seuraajat.
+Nämä voisi poistaa ja korvata uudella versiolla Solmujoukko parit
+\begin{javacode}
+/**
+* @.pre leima != null && sisältääSolmun(leima)
+* @.post RESULT == (solmuun linkitettyjen kaarien toisissa päissä olevat solmut)
+*/
+public Solmujoukko parit(String leima)
+\end{javacode}
+Solmujoukko parit palauttaa kaikki solmut, jotka ovat yhteydessä kyseiseen slomuun jo
+olemassaolevien kaarien kautta.
 
 
-
-
-
-Tekijänä Janina Kuosmanen (516580)
+Tekijänä Tommi Heikkinen (517749)
