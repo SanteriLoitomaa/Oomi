@@ -1,160 +1,36 @@
 
 \chapter{Tehtävä 1 \label{chap:Teht=0000E4v=0000E4-1}}
 
-Tehtävässä tutustutaan oom-kit -kehykseen ja siitä löytyviin luokkiin
+Tehtävänä oli malintaa kolme matopelin tapausta käyttötapauskaavioilla
+\section{Mato pelin mallinnus}
 
-\section{fi.utu.oomkit -luokat}
+\label{Madon liikkuminen}
 
-\label{fi.utu.oomkit -luokat}
+Madon liikkuminen kehyksessä tapahtuu niin että, käyttäjä antaa suunnan mihin liikutaan ja mato liikkuu jokaisella 
+tickillä vähäsen siihen suuntaan kunnes pelaaja vaihtaa suuntaa. Pelaaja ohjaa madon päätä ja madon häntä tulee perässä
+niin että jokainen hännän osa saa koordinaateiksi sitä edeltävän osan vanhan paikan.
 
-fi.utu.oomkit.gui -paketista löytyy luokat:
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/SnakeGame1}
+\label{Liikkuminen} 
+\end{figure}
 
-\begin{javacode}
-public interface Console {}
-class DefaultDialogFactory implements DialogFactory {}
-public interface DialogFactory {}
-class FXConsole extends OutputStream implements Console {}
-public interface MainWindow extends WindowContent {}
-public abstract class MainWindowBase implements MainWindow {}
-class MergedStream extends OutputStream {}
-public abstract class OOMApp extends Application {}
-public class ReactiveCanvas<X> extends SimpleCanvas implements Observer<X> {}
-public class ReactiveLabel<T> extends Label implements Observer<T> {
-	public interface LabelHandler<T> {}
-}
-public class SimpleCanvas extends Canvas {}
-class StreamWrapper extends OutputStream {}
-public interface WindowContent {}
-\end{javacode}
+\label{Evään syönti}
+Kun madon pään koordinaatit ovat samat kuin evään, eväs syödään eli poistetaan kehyksestä. Mato saa pisteitä eväältä ja sen häntä kasvaa yhden pykälän. Uusi eväs asetetaan jonnekin kehykseen. 
 
-Joista kaikki ovat julkisia paketin sisällä, mutta paketin ulkopuolella
-näkyvistä on jätetty luokat DefaultDialogFactory, FXConsole, MergedStream ja
-StreamWrapper. fi.utu.oomkit -paketista löytyy luokat:
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/SnakeGame2}
+\label{Syönti} 
+\end{figure}
 
-\begin{javacode}
-public final class AppConfiguration {}
-public interface AppLogic extends KeyHandler, Scheduled {}
-\end{javacode}
+\label{Törmäys}
+Jos mato osuu kehyksen seinään se menettää pituutta ja pysähtyy kunnes sille annetaan uusi suunta. 
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/SnakeGame3}
+\label{törmäysSeinään} 
+\end{figure}
 
-Joista kaikki ovat julkisia luokkia niin paketin sisällä kuin ulkopuolella.
 
-\section{OOMApp -luokka sovelluksen ikkunan luomiseksi}
 
-\label{OOMApp -luokka sovelluksen ikkunan luomiseksi}
- 
-OOMApp -luokka peritään ja sille kirjoitetaan generateMainWindow -metodi.
 
-GenerateMainWindow -metodilla määritellään mikä on ohjelman (=app) nimi ja
-kuinka ison alueen ohjelma käyttää. Metodin tulee palauttaa MainWindow
--alaluokka. OOMApp -luokan käyttöä on esitetty DemoApp1 -tutoriaalissa
-seuraavasti:
-
-\begin{javacode}
-public class DemoApp1 extends OOMApp {
-    // alustaa pelilogiikan
-    final static LaatikkoGameLogic gameLogic = new LaatikkoGameLogic();
-
-    // kytkee piirtopinnan käyttöliittymään
-    @Override
-    protected MainWindow generateMainWindow(String appName, double width,
-    double height) { return new SimpleMainWindow(appName, width, height) {
-            @Override public SimpleCanvas mainContent() {
-                return gameLogic.piirtoPinta;
-            }
-        };
-    }
-}
-\end{javacode}
-
-EmptyApp -luokassa generateMainWindow -metodille on tehty mielekäs
-esimerkki-implementaatio, jolloin sitä voi käyttää sellaisenaan muodostaessa
-ohjelman ikkunaa. Siitä löytyy valmiiksi ajettava main-metodi.
-
-\section{Ohjelman ikkunan sisällön hallitseminen}
-
-\label{}
-
-Ikkuna luodaan käyttämällä luokkaa MainWindow. Huomionarvoista on, että
-MainWindow -olion sisältö koostuu ylä- ja alapalkista, sekä
-Canvas-piirtoalueesta. Oletuksena nämä ovat tyhjiä, jolloin oman sisällön voi
-luoda ylikirjoittamalla metodit topBarContent(), mainContent(),
-bottomBarContent(). 
-
-\begin{javacode}
-public class EmptyApp extends OOMApp {
-	@Override
-	protected MainWindow generateMainWindow(){
-		return new SimpleMainWindow(appName, width, height) {
-			
-			@Override
-			public List<Node> topBarContent() { 
-				//return yläpalkin sisältö
-			}
-		
-			@Override
-			public Canvas mainContent() { 
-				//return pääsisältö
-			}
-		
-			@Override
-			public List<Node> bottomBarContent() { 
-				//return alapalkin sisältö
-			}
-		}
-	}
-}
-\end{javacode}
-
-Ylä- ja alapalkkiin voidaan lisätä mitä tahansa graafisia solmuja, jotka voivat
-olla erilaisia graafisia käyttöliittymäkomponentteja. Ylikirjoittamalla
-topBarContent() -metodin voidaan sijoittaa käyttöliittymään lista mitä tahansa
-elementtejä kuten esimerkiksi luokkien Canvas, ImageView, Shape tai Button
-luokkien oliot. Yläpalkin lisäämisessä voitaisiin käyttää esimerkiksi seuraavaa
-metodia:
-
-\begin{javacode}
-@Override
-public List<Node> topBarContent() {
-	return Arrays.asList(
-		new Button("File"),
-		new Button("Edit"),
-		new Button("Window"),
-		new Button("Help")
-	);
-}
-\end{javacode}
-
-Tämä lisää työkalurivin kaltaiset painikkeet yläpalkkiin
-
-\section{Ohjelmanaikaiset tapahtumat}
-
-\label{D}
-
-OOMApp -luokan olion konstruktorilla pystytään luomaan useanlaisia logiikoita
-ohjelman suoritukseksi. Oma logiikka voidaan lisätä käyttämällä OOMApp
-konstruktoria, johon syötetään ohjelmalogiikka. Ohjelmalogiikkaluokka peritään
-AppLogic -luokalta. Seuraavassa esimerkissä on esitetty, kuinka MyLogic
--luokalla voidaan hallita ohjelmalogiikkaa niin, että asiakkaan koodi
-suoritetaan joka 25ms.
-
-\begin{javacode}
-public class MyApp extends OOMApp {
-	public MyApp() {
-		super(new MyLogic());
-	}
-}
-
-public class MyLogic extends AppLogic {
-	@override
-	AppConfiguration configuration() {
-		return new AppConfiguration(25, "Asiakkaan ohjelma", true);
-	}
-    
-	@override
-	void tick() {
-		//asiakkaan koodi
-	}
-}
-\end{javacode}
-
-- Pasi Toivanen (517487)
+- Janina Kuosmanen (516580)
