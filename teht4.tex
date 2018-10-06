@@ -1,231 +1,288 @@
 
 \chapter{Tehtävä 4 \label{chap:Teht=0000E4v=0000E4-4}}
 
-Tehtävän tarkoituksena on luoda lukitusmenetelmä OOMKit-ohjelmiin, joka estää kaiken näkyvyyden ohjelmaan kunnes ohjelman avaava koodi syötetään täysin oikein. Aikarajaa salasanan syöttöön ei ole.
+Tehtävän tarkoituksena on luoda mallinnus OOM-kurssin aiheuttaman tuskan minimoivasta metodista.
 
-\section{Lukitus-luokka (kohdat a ja b)}
+\section{Opiskelija-luokat (kohdat a)}
 
-\label{Lukitus-luokka}
+\label{Opiskelija-luokat}
 
-Kohdassa a tuli määrittää luokka Lukitus, jolla voisi lukita OOMKit-ohjelman. Kohdassa b se taas tuli toteuttaa. Kirjaan molemmat kohdat tähän samaan osioon.
+Kohdassa a tuli määrittää ja toteuttaa luokat TavallinenOpiskelija ja ValeasuOpiskelija. Tulin lopputulokseen että TavallinenOpiskelija on vain Opiskelija-rajapinnan toteutus mutta ValeasuOpiskelija on nimenomaan valeasu, jonka ainoa arvo on TavallinenOpiskelija ja kaikki metodit suunnataan suoraan tälle opiskelijalle.
 
-\subsubsection{Lukitus-luokka}
-\label{Lukitus-luokka}
+\subsubsection{TavallinenOpiskelija-luokka}
+\label{TavallinenOpiskelija-luokka}
 \begin{javacode}
-/**
- * @author Santeri Loitomaa
- */
-public class Lukitus {
-  private ArrayList<Key> codeLukituskoodi;
-  private ArrayList<Key> yritysLukituskoodi;
-  private boolean lukossa;
-  /**
-   * Konstruktori lukolle.
-   * @param codeLukituskoodi
-   */
-  public Lukitus(ArrayList<Key> codeLukituskoodi) {
-    this.codeLukituskoodi = codeLukituskoodi;
-    this.yritysLukituskoodi = new ArrayList<Key>();
-    this.lukossa = false;
+public class TavallinenOpiskelija implements Opiskelija {
+  String nimi;
+  int opNumero;
+  OOMTilanne oomTilanne;
+  public TavallinenOpiskelija(String nimi, int opNumero, boolean hereillä) {
+    this.nimi = nimi;
+    this.opNumero = opNumero;
+    this.oomTilanne = new OOMTilanne();
+    oomTilanne.hereillä = hereillä;
   }
   /**
-   * Asettaa boolean lukossa-arvon oikeaksi.
-   * @.pre Tätä metodia tulee kutsua vain jos ohjelma on lukossa.
-   * @.post   if(merkki == oikein) lukossa = true;
-   *       if(merkki != oikein) lukossa = true;
-   *       (kun kaikki merkit oikein) lukossa = false;
-   * @param Key merkki
+   * @.pre true
+   * @.post RESULT == (Palauttaa tilanneolion)
    */
-  public void tarkista(Key merkki){
-    yritysLukituskoodi.add(merkki);
-    if(codeLukituskoodi.equals(new ArrayList<Key>())) {
-      yritysLukituskoodi = new ArrayList<Key>();
-      lukossa = false;
+  @Override
+  public OOMTilanne annaOOMTilanne() {
+    return oomTilanne;
+  }
+  /**
+   * Asettaa opiskelijan nimen ja op. numeron
+   * 
+   * @.pre nimi != null && opNumero>0
+   * @.post (nimi & op.numero asetettu)
+   **/
+  @Override
+  public void asetaNimiJaOpNumero(String nimi, int opNumero) {
+    this.nimi = nimi;
+    this.opNumero = opNumero;
+  }
+  /**
+   * @.pre true
+   * @.post annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä
+   *        == false && annaOOMTilanne().luennolla == false &&
+   *        (OLD(annaOOMTilanne().ilmoittautunut) || Maailma.tuskanMäärä ==
+   *        OLD(Maailma.tuskanMäärä) + 1000)
+   */
+  @Override
+  public void ilmoittauduOOMKurssille() {
+    if(!oomTilanne.ilmoittautunut) {
+      oomTilanne.ilmoittautunut = true;
+      Maailma.lisääTuskaa(1000);
     }
-    else if(codeLukituskoodi.get(yritysLukituskoodi.size()-1) !=
-        yritysLukituskoodi.get(yritysLukituskoodi.size()-1)) {
-      System.out.println("Nyt meni väärin. Aloita alusta.");
-      yritysLukituskoodi = new ArrayList<Key>();
-      lukossa = true;
+  }
+  /**
+   * @.pre annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä ==
+   *       false
+   * @.post Maailma.tuskanMäärä == OLD(Maailma.tuskanMäärä) + 10 &&
+   *        annaOOMTilanne().luennolla == true
+   */
+  @Override
+  public void osallistuLuennolle() {
+    oomTilanne.luennolla = true;
+    Maailma.lisääTuskaa(10);
+    if(oomTilanne.hereillä) {
+      Maailma.lisääTuskaa(90);
     }
-    else if(codeLukituskoodi.size() == yritysLukituskoodi.size()) {
-      System.out.println("Koodi on syötetty oikein.");
-      yritysLukituskoodi = new ArrayList<Key>();
-      lukossa = false;
-    }
   }
   /**
-   * Kertoo onko lukko lukossa.
-   * @return true jos lukossa.
+   * @.pre 0 ≤ aikaaLuennonAlusta < 90
+   * @.post annaOOMTilanne().hereillä == true
    */
-  public boolean onLukossa() {
-    return lukossa;
+  @Override
+  public void herää(int aikaaLuennonAlusta) {
+    oomTilanne.hereillä = true;
   }
   /**
-   * Merkitsee lukon lukituksi.
-   * @.post lukossa = true;
+   * @.pre annaOOMTilanne().luennolla == true
+   * @.post annaOOMTilanne().luennolla == false && annaOOMTilanne().hereillä ==
+   *        false
    */
-  public void lukitse() {
-    lukossa = true;
+  @Override
+  public void poistuLuennolta() {
+    oomTilanne.luennolla = false;
+    oomTilanne.hereillä = false;
   }
   /**
-   * Vaihtaa salasanan.
-   * @.post codeLukituskoodi = codeLukituskoodi
-   * @param codeLukituskoodi
+   * @.pre annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä ==
+   *       true
+   * @.post Maailma.tuskanMäärä == OLD(tuskanMäärä) + 90 -
+   *        hereilläAlkaenMinuutista && annaOOMTilanne().hereillä == true
    */
-  public void setCodeLukituskoodi(ArrayList<Key> codeLukituskoodi) {
-    this.codeLukituskoodi = codeLukituskoodi;
-  }
-  /**
-   * Kertoo nykyisen lukituskoodin.
-   * @return codeLukituskoodi
-   */
-  public ArrayList<Key> getCodeLukituskoodi(){
-    return codeLukituskoodi;
+  @Override
+  public void vastaaKysymykseen(int aikaaLuennonAlusta) {
+    herää(aikaaLuennonAlusta);
+    Maailma.lisääTuskaa(90-aikaaLuennonAlusta);
   }
 }
 \end{javacode}
 
-Tulin tällaisen lopputulokseen. Tämä toimii melko hyvin lisättynä OOMKitin DemoApp3:een pienten muutosten kera.
-
-\pagebreak
-
-\section{DemoApp3-luokka (kohta c)}
-
-\label{DemoApp3-luokka}
-
-DemoApp3:een tein seuraavat muutokset jotta Lukitus-luokkaa voitaisiin käyttää hyvin.
-
+\subsubsection{ValeasuOpiskelija-luokka}
+\label{ValeasuOpiskelija-luokka}
 \begin{javacode}
-class LaatikkoGameLogic2 implements AppLogic {
-  ...
-  private Lukitus lukko = new Lukitus(new ArrayList<Key>());
-  private boolean vaihdetaankoSalasana = false;
-  private boolean vaihdetaanSalasanaa = false;
-  private ArrayList<Key> uusiSalasana = new ArrayList<Key>();
-  private boolean lukitaanko = false;
-  ...
-  @Override
-  public void tick() {
-    ...
-    // piilottaa näkymän jos lukossa
-    piirtoPinta.asetaPiilotus(lukko.onLukossa());
-    ...
+public class ValeasuOpiskelija implements Opiskelija {
+  Opiskelija opiskelija;
+  public ValeasuOpiskelija(Opiskelija opiskelija) {
+    this.opiskelija = opiskelija;
   }
-  // käsittele näppäimen painallus
+  /**
+   * @.pre true
+   * @.post RESULT == (Palauttaa tilanneolion)
+   */
   @Override
-  public void handleKey(Key k) {
-    System.out.println(k);
-    if(lukko.onLukossa()) {
-      lukko.tarkista(k);
-    }
-    else if(vaihdetaanSalasanaa) {
-      uusiSalasana.add(k);
-      if(k == Key.Backspace) {
-        uusiSalasana = new ArrayList<Key>();
-        System.out.println("Salasanan vaihto peruutettu.");
-        vaihdetaanSalasanaa = false;
-        vaihdetaankoSalasana = false;
+  public OOMTilanne annaOOMTilanne() {
+    return opiskelija.annaOOMTilanne();
+  }
+  /**
+   * Asettaa opiskelijan nimen ja op. numeron
+   * 
+   * @.pre nimi != null && opNumero>0
+   * @.post (nimi & op.numero asetettu)
+   **/
+  @Override
+  public void asetaNimiJaOpNumero(String nimi, int opNumero) {
+    opiskelija.asetaNimiJaOpNumero(nimi, opNumero);
+  }
+  /**
+   * @.pre true
+   * @.post annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä
+   *        == false && annaOOMTilanne().luennolla == false &&
+   *        (OLD(annaOOMTilanne().ilmoittautunut) || Maailma.tuskanMäärä ==
+   *        OLD(Maailma.tuskanMäärä) + 1000)
+   */
+  @Override
+  public void ilmoittauduOOMKurssille() {
+    opiskelija.ilmoittauduOOMKurssille();
+  }
+  /**
+   * @.pre annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä ==
+   *       false
+   * @.post Maailma.tuskanMäärä == OLD(Maailma.tuskanMäärä) + 10 &&
+   *        annaOOMTilanne().luennolla == true
+   */
+  @Override
+  public void osallistuLuennolle() {
+    opiskelija.osallistuLuennolle();
+  }
+  /**
+   * @.pre 0 ≤ aikaaLuennonAlusta < 90
+   * @.post annaOOMTilanne().hereillä == true
+   */
+  @Override
+  public void herää(int aikaaLuennonAlusta) {
+    opiskelija.herää(aikaaLuennonAlusta);
+  }
+  /**
+   * @.pre annaOOMTilanne().luennolla == true
+   * @.post annaOOMTilanne().luennolla == false && annaOOMTilanne().hereillä ==
+   *        false
+   */
+  @Override
+  public void poistuLuennolta() {
+    opiskelija.poistuLuennolta();
+  }
+  /**
+   * @.pre annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä ==
+   *       true
+   * @.post Maailma.tuskanMäärä == OLD(tuskanMäärä) + 90 -
+   *        hereilläAlkaenMinuutista && annaOOMTilanne().hereillä == true
+   */
+  @Override
+  public void vastaaKysymykseen(int aikaaLuennonAlusta) {
+    opiskelija.vastaaKysymykseen(aikaaLuennonAlusta);
+  }
+}
+\end{javacode}
+
+
+
+\section{OpiskelijaAllas-luokka (kohta c)}
+
+\label{OpiskelijaAllas-luokka}
+
+Kohdassa c pyydetään toteuttamaan luokka, jonka avulla kierrätetään opiskelijoita, jottei kaikkien tarvitse ilmoittautua tälle tuskaa tuottavalle kurssille.
+
+\subsubsection{OpiskelijaAllas-luokka}
+\label{OpiskelijaAllas-luokka}
+\begin{javacode}
+public class OpiskelijaAllas {
+  private static Opiskelija[] opiskelijat = new Opiskelija[0];  
+  /**
+   * Metodi joka luo uusia opiskelijoita vain tarpeen vaatiessa.
+   * @param uhriMäärä
+   * @param vuosi
+   */
+  public static void hankiOpiskelijat(int uhriMäärä, int vuosi) {
+    Opiskelija[] uusiAllas = new Opiskelija[uhriMäärä];
+    if(uhriMäärä > opiskelijat.length) {
+      for(int i = 0; i < opiskelijat.length; i++) {
+        uusiAllas[i] = opiskelijat[i];
       }
-      if(k == Key.Enter) {
-        lukko.setCodeLukituskoodi(uusiSalasana);
-        uusiSalasana = new ArrayList<Key>();
-        System.out.println("Salasana vaihdettu.");
-        vaihdetaanSalasanaa = false;
-        vaihdetaankoSalasana = false;
-       }
+      for(int i = opiskelijat.length; i < uhriMäärä; i++) {
+        uusiAllas[i] = new ValeasuOpiskelija(new TavallinenOpiskelija("Uniikki Lumihiutale", 1234567 + i, false));
+      }
     }
-    else if(lukitaanko && k == Key.N) {
-      lukitaanko = false;
-      System.out.println("Lukitus peruutettiin.");
+    else {
+      for(int i = 0; i < uhriMäärä; i++) {
+        uusiAllas[i] = opiskelijat[i];
+      }
     }
-    else if(lukitaanko && k == Key.Y) {
-      lukitaanko = false;
-      lukko.lukitse();
-      System.out.println("Lukittu.");
+    for (int i = 0; i < uhriMäärä; i++) {
+      uusiAllas[i].asetaNimiJaOpNumero("Uniikki Lumihiutale", 1234567 + i + vuosi);
     }
-    else if(vaihdetaankoSalasana && k == Key.N) {
-      vaihdetaankoSalasana = false;
-    }
-    else if(vaihdetaankoSalasana && k == Key.Y) {
-      vaihdetaanSalasanaa = true;
-      System.out.println("Anna uusi salasana merkki kerrallaan.");
-      System.out.println("Tallenna painamalla Enter.");
-      System.out.println("Peruuta painamalla Backspace.");
-    }
-    else if(k == Key.Space) {
-      System.out.println("Haluatko lukita ohjelman? Y/N");
-      lukitaanko = true;
-    }
-    else if(k == Key.Backspace) {
-      System.out.println("Nykyinen salasana:");
-      System.out.println(lukko.getCodeLukituskoodi());
-    }
-    else if(k == Key.Enter) {
-      System.out.println("Haluatko asettaa uuden salasanan? Y/N");
-      vaihdetaankoSalasana = true;
-    }
+    opiskelijat = uusiAllas;
+  }  
+  /**
+   * Metodi joka luo aina uudet opiskelijat.
+   * @param uhriMäärä
+   */
+  public static void hankiOpiskelijat(int uhriMäärä) {
+    Opiskelija[] uusiAllas = new Opiskelija[uhriMäärä];
+    for (int i = 0; i<uhriMäärä; i++)
+    uusiAllas[i] = new TavallinenOpiskelija("Uniikki Lumihiutale", 1234567+i, true);
+    opiskelijat = uusiAllas;
   }
+  /**
+   * Palauttaa opiskelijat.
+   * @return
+   */
+  public static Opiskelija[] opiskelijat() {
+    return opiskelijat;
+  }  
 }
 \end{javacode}
 
-Lukitusta voidaan hallita handleKey(Key k)-metodilla.
-
-\pagebreak
-
-\section{Testi-luokka (kohta d)}
-
-\label{Testi-luokka}
-
-En juuri tiedä, miten testiluokka tulisi tehdä Jqwikilla, joten teen sen JUnitilla. Ensin testataan oikealla salasanalla ja sitten uudelleen lukittuna väärällä.
 
 
+\section{Opiskelija testi (kohta b ja d)}
+
+\label{Opiskelija testi}
+
+Kohdassa b testataan luokkien eroavaisuuksia. Opiskelijoita 100 per vuosi.
+
+Valeasulla pienenevä tuska.
+
+\subsubsection{TavallinenOpiskelija-luokalla}
+\label{TavallinenOpiskelija-luokalla}
 \begin{javacode}
-class Testi {
-  static Lukitus lukko;
-  static ArrayList<Key> salasana = new ArrayList<Key>();
-  @BeforeAll
-  static void setUpBeforeClass() throws Exception {
-    salasana.add(Key.T);
-    salasana.add(Key.E);
-    salasana.add(Key.S);
-    salasana.add(Key.T);
-    salasana.add(Key.I);
-    lukko = new Lukitus(salasana);
-    lukko.lukitse();
-  }
-  @Test
-  void test() {
-    lukko.tarkista(Key.T);
-    lukko.tarkista(Key.E);
-    lukko.tarkista(Key.S);
-    lukko.tarkista(Key.T);
-    lukko.tarkista(Key.I);
-    if(lukko.onLukossa()) {
-      fail("Salasana ei toiminut");
-    }
-    lukko.lukitse();
-    lukko.tarkista(Key.T);
-    lukko.tarkista(Key.E);
-    lukko.tarkista(Key.S);
-    lukko.tarkista(Key.Y);
-    lukko.tarkista(Key.I);
-    if(!lukko.onLukossa()) {
-      fail("Salasana toimi vaikkei pitänyt");
-    }
-  }
-}
+Tuska yhteensä: 117840
 \end{javacode}
 
-\pagebreak 
-
-Testi ei tuottanut yhtään virhettä ja konsolin tulosteet näyttävät oikealta.
-
+\subsubsection{ValeasuOpiskelija-luokalla}
+\label{ValeasuOpiskelija-luokalla}
 \begin{javacode}
-Koodi on syötetty oikein.
-Nyt meni väärin. Aloita alusta.
-Nyt meni väärin. Aloita alusta.
+Tuska yhteensä: 108840
 \end{javacode}
+
+Altailla pienenevä tuska.
+
+\subsubsection{Ilman altaita}
+\label{Ilman altaita}
+\begin{javacode}
+Vuoden 1 tuska: 108840
+Vuoden 2 tuska: 108840
+Vuoden 3 tuska: 108840
+Vuoden 4 tuska: 108840
+Vuoden 5 tuska: 108840
+Tuska yhteensä: 544200
+\end{javacode}
+
+\subsubsection{Altailla}
+\label{Altailla}
+\begin{javacode}
+Vuoden 1 tuska: 108840
+Vuoden 2 tuska: 8840
+Vuoden 3 tuska: 8840
+Vuoden 4 tuska: 8840
+Vuoden 5 tuska: 8840
+Tuska yhteensä: 144200
+\end{javacode}
+
+ValeasuOpiskelija-allas luo vähiten tuskaa eli koodi toimii.
 
 Tekijänä Santeri Loitomaa (516587)
 
