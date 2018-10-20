@@ -1,108 +1,250 @@
-\chapter{Tehtävä 3: Gorilla -peli \label{chap:Teht=0000E4v=0000E4-2}}
+\chapter{Tehtävä 3: 
+\label{chap:Teht=0000E4v=0000E4-2}}
 
-\section{Peliä kuvaavat luokkakokonaisuudet (a,b)}
+\section{yhdistä() -metodin palautuvat viittaukset}
 
-\label{Peliä kuvaavat luokkakokonaisuudet (a,b)}
+\label{}
 
-Kuvausten ja tehtävien pohjalta on tehty luokkakaavio kuvassa \ref{Gorilla},
-jolla pyrin kuvaamaan lopullista peliä. Luokkakaaviossa on olioiden hierarkian
-lisäksi kuvattu niiden määräsuhteita ja abstraktit luokat on merkitty sinisen
-sijaan valkoisella pohjalla.
+Muodostetaan ensin tehtävän tarvitsema oliohierarkia kirjoittamalla luokat
+muotoon:
 
-\begin{figure}
-\centering \includegraphics[width=0.5\textwidth]{kuvat/GorillaPeli}
-\caption{Luokkakaavio Gorilla-Pelistä}
-\label{Gorilla} 
-\end{figure}
+\begin{javacode}
+class Eucarya {}
+class Animalia extends Eucarya {}
+class Chordata extends Animalia {}
+ja niin edelleen
+\end{javacode}
 
-Kuvasta \ref{Gorilla} on jätetty selkeyden vuoksi merkitsemättä luokat vektori,
-osumalaatikko ja rajapinnat aktiivinen, piirrettävä, heitettävä ja kerättävä.
-Nämä kaikki luokat voidaan jakaa suunnittelu, analyysi ja toteutusluokkiin (kts
-\ref{Gorillajako}), jossa suunnitteluluokkiin kuuluu pääasiassa abstrakteja
-luokkia. Analyysiluokista löytyy pelin rakenteeseen liittyviä luokkia ja
-tuuli-luokka jota ei ruudulla suoraan näe vaan liittyy enemmän pelimoottorin
-toimintaan.
+Tuloksena saadaan oliohierarkia (kuva \ref{Lajisto}). 
 
 \begin{figure}
-\centering \includegraphics[width=0.5\textwidth]{kuvat/GorillaLuokat}
-\caption{Suunnittelu-, analyysi ja toteutusluokkiin jako}
-\label{Gorillajako} 
+\centering \includegraphics[width=0.5\textwidth]{kuvat/Lajisto}
+\caption{Luokkakaavio lajiston periytyvyydestä}
+\label{Lajisto} 
 \end{figure}
 
-Toteutusluokista löytyy selkeitä käsitteitä, joita pelissä nähdään visuaalisina
-elementteinä ja näitä näkyviä olioita yhdistää myös rajapinta Piirrettävä, joka
-määrittelee millaiset metodit tulee luokasta löytyä, että se voidaan piirtää
-ruudulle. Aktiivisten luokkien oliot ovat sellaisia, joille löytyy oma
-päivitysmetodi mikä toteutetaan jokaisen tick() -metodin tai toisin sanoen
-jokaisen pelin päivitysiteraation aikana. 
+Yhdistä() -metodi voidaan toteuttaa ylikuormitettuna käyttämällä apuna metodia
+getLevel(), joka antaa olion lajitason kokonaislukuna niin, että Eucarya -luokan
+oliot palauttavat luvun 0, Animalia 1:sen jne\ldots getLevel() ja yhdistä()
+-metodit esitetään seuraavaksi koostetusti niin, että luokkahierarkia jätetään
+esittämättä.
 
-Esineet ovat kerättäviä asioita pelikentiltä, jotka voisivat olla esimerkiksi
-pisteitä, lisä elämiä tai banaaneja, joita voi heitellä toisten pelaajien niskaan. Itse rajapinta
-Heitettävä kuvaa kaikkia olioita, joita pelaaja voi singota omalla gorillallaan.
-Nämä kaikki rajapinnat kuvaavat pelissä tapahtuvia vuorovaikuttavia elementtejä,
-mutta sen lisäksi tarvitaan koristeita, jotka tuovat pelin taustaksi grafiikkaa
-ja mallintavat selkeästi pelaajalle missä rakennukset peliruudulla ovat.
+\begin{javacode}
+/**
+ * Level kuvaa kuinka korkealla eliö on lajistotasolla
+ * @return 0 ellei eliö ole korkeampaa luokkaa
+ */
+public int getLevel() {
+	return 0;
+}
 
-\section{Pakettikokonaisuudet ja uudelleenkäytettävyys (c, d)}
+/**
+ * Rekursiivinen määrittely korkeammille luokille
+ */
+@Override
+public int getLevel() {
+	return super.getLevel()+1;
+}
+	
+/**
+ * 
+ * @param input Saman lajitason eliö
+ * @return Taulukko muodossa {this,eliö}, jos eliö on samalla tasolla. 
+ */
+public Eucarya[] yhdistä(Eucarya eliö) {
+	if (this.getLevel() == eliö.getLevel()) {
+		return new Eucarya[] {this,eliö};
+	}
+	return new Eucarya[] {};
+}
 
-\label{Pakettikokonaisuudet ja uudelleenkäytettävyys (c, d)}
+/**
+ * 
+ * @param eliöTaulukko
+ * @return Taulukko, johon on lisätty this. Palauttaa tyhjän taulukon jos eliöt
+ * eivät ole samalla tasolla.
+ */
+public Eucarya[] yhdistä(Eucarya... eliöTaulukko) {
+	Eucarya[] result = new Eucarya[eliöTaulukko.length + 1];
+	result[0] = this;
+	
+	for (int i = 0; i < eliöTaulukko.length; i++) {
+		if (this.getLevel() != eliöTaulukko[i].getLevel()) {
+			return new Eucarya[] {};
+		}
+		result[i+1] = eliöTaulukko[i];
+	}
+	return result;
+}
+\end{javacode}
 
-Kuvan \ref{Gorilla} luokkia voidaan jakaa ryhmiin, jotka kuvaavat
-pääsääntöisesti jotain pelin osa-aluetta niin, että vuorovaikutukset ryhmän
-sisällä on suurempaa kuin ryhmien välillä. Ryhmät voitaisiin nimetä paketeiksi
-seuraavalla tavalla:
+Testausta varten käytetään tulosta() -metodia joka selittää lyhyesti eliöiden lajitason. 
 
-\begin{itemize}
-\item \underline{Player} (\underline{Pelaaja}, \underline{Ohjain})
-\item \underline{Engine} (\underline{Kenttä}, \underline{Kappale},
-\underline{Maa}, \underline{Esine})
-\item Map (Rakennus, Ikkuna)
-\item Character (Banaani, Gorilla)
-\item Graphics (Aurinko, Taivas)
-\item \underline{Menu} (\underline{Peli})
-\end{itemize}
+\begin{javacode}
+public static void tulosta(String otsikko, Eucarya... taulukko) {
+	System.out.println(otsikko);
+	for (int i = 0; i < taulukko.length; i++) {
+		System.out.println("Eliön lajitaso " + i + ": " + taulukko[i].getClass());
+	}
+}
+\end{javacode}
 
-Player-paketissa olisi työkaluja pelaajien ja pelaajien käyttämien ohjainten
-hallintaan. Engineä pystytään uudelleenkäyttämään, kun halutaan tehdä
-samanlaiseen pelimekaniikkaan liittyvä peli tai modi. Menu-pakettilla voidaan
-muodostaa toinen moninpeli, jossa 1-4 pelaajaa kamppailee toisiaan vastaan
-erissä, joiden pisteitä lasketaan. Map, Character, Graphics paketit liittyvät
-tiiviisti pelin ulkonäköön ja olemukseen, joten muita pelejä tehdessä näitä
-paketteja tuskin pystyy paljon käyttämään hyväksi.
+Jolloin voidaan suorittaa tehtävässä kysytty algoritmi:
 
-\section{Fysiikan mallinnuksen soveltaminen (e)}
+\begin{javacode}
+Eucarya[] taulukko = maunkiharapyrstö.yhdistä(meksikonkarhu);
+tulosta("maunkiharapyrstön ja meksikonkarhun yhdistelmä",taulukko);
 
-\label{Fysiikan mallinnuksen soveltaminen (e)}
+taulukko = kapinleijona.yhdistä(meksikonkarhu);
+tulosta("kapinleijonan ja meksikonkarhun yhdistelmä",taulukko);
 
-Fysiikanmallinnuksen soveltaminen pelimoottoriin voidaan tehdä monella tavalla
-ja se riippuu pääsääntöisesti pelistä. Joissain arcade -peleissä fysiikan lakeja
-halutaan venyttää ja muokata niin, että pelikokemus on viihdyttävämpi. Tässä
-tapauksessa voimille ja kentille voi tehdä omat oliot, jolloin pelin logiikan
-kehityksessä näitä voimia tai impulsseja voidaan säätää yliampuviksi tarpeen
-mukaan.
+taulukko = kapinleijona.yhdistä(maunkiharapyrstö.yhdistä(meksikonkarhu));
+tulosta("meksikonkarhun, maunkiharapyrstön ja kapinleijonan yhdistelmä",taulukko);
 
-Jos pelissä on kyseessä enemmän simulointi, jossa halutaan, että samat fysiikan
-lait pätevät kaikkialla pelikentällä kaikille olioille, niin esimerkiksi
-Painovoima, Voima ja Impulssi -olioiden tekeminen on turhaa. Fysiikan lait
-pystytään silloin kuvaamaan esimerkiksi kuvan \ref{Gorilla} kaltaisessa
-luokkahierarkiassa pelkästään Kappale -luokan sisällä, jolloin yksikään
-aliluokka tai olio ei pysty tästä säännöstä poikkeamaan.
+//maunkiharapyrstön ja meksikonkarhun yhdistelmä
+//Eliön lajitaso 0: class Bishop
+//Eliön lajitaso 1: class Arctos
+//kapinleijonan ja meksikonkarhun yhdistelmä
+//Eliön lajitaso 0: class Leo
+//Eliön lajitaso 1: class Arctos
+//meksikonkarhun, maunkiharapyrstön ja kapinleijonan yhdistelmä
+//Eliön lajitaso 0: class Leo
+//Eliön lajitaso 1: class Bishop
+//Eliön lajitaso 2: class Arctos
+\end{javacode}
 
-Esimerkiksi painovoiman, tai pikemminkin normaalikiihtyvyyden suuruus voitaisiin
-määrätä final static -muodossa vektoriksi, jolloin kaikki kappaleet pelissä
-joutuisivat sitä noudattamaan. Normaalikiihtyvyyden vektori kannattaisi pitää
-vähintään static -muotoisena, jolloin jos maan painovoimakentästä siirryttäisiin
-kuun painovoimaan, niin kaikki pelialueen oliot välittömästi päivittyisivät
-tähän. Pelimoottori ei näytä välttämättä eheältä, jos jotkin kappaleet liikkuvat
-kuin `eri planeetalla`.
+Huomion arvoista on, että taulukkojen yhdistäminen tapahtuu niin, että jokainen
+eliö tulee olla samalla lajitasolla. Jos ylläolevan koodin rivillä 7 tapahtuisi
+tilanne, jossa sisempien sulkujen sisällä yhdistäminen ei onnistuisi, niin
+tulostuisi pelkästään taulukko, jossa olisi kapinleijona. Olisi siis
+turvallisempaa toteuttaa rivi 7 käyttäen yhdistä() -metodia seuraavalla tavalla:
 
-Voima tai Painovoima -luokista luopuminen ei kumminkaan tarkoita sitä, että
-pelimoottorin mekaniikan toteuttavissa metodeissa nämä käsitteet ei tarvitsisi
-olla hyvin dokumentoituja. Päinvastoin: metodien toteutuksessa tulee nimetä
-hyvin selkeästi milloin on kyse kiihtyvyydestä, milloin voimasta tai milloin
-liiketilasta. Dokumentaatiossa kannattaa myös merkitä, että mikä rivi toteuttaa
-minkäkin fysiikan lain: Newtonin lait, Galileon suhteellisuus, voimien
-resultanttivektorin summaus ja jotta fysiikan mallinnuksen tuottava algoritmi on
-selkeästi luettavissa.
+\begin{javacode}
+taulukko = kapinleijona.yhdistä(new Eucarya[] {maunkiharapyrstö,meksikonkarhu});
+\end{javacode}
 
-Tekijänä Pasi Toivanen (517487)
+Jolloin taulukko olisi varmasti tyhjä, jos jokin eliöistä on mahdotonta yhdistää
+kapinleijonan kanssa.
+
+\section{Olio-taulukon varianssi}
+
+\label{}
+
+Jos ajetaan tehtävänohjeistuksen mukainen koodi:
+
+\begin{javacode}
+Olio[] oliot = new Olio[] { new Olio() };
+oliot[0] = new Olio(); // OK
+Object[] objektit = oliot;
+objektit[0] = new Olio(); // OK 
+objektit[0] = new Object();
+System.out.println("Onnistui");
+\end{javacode}
+
+Jossa Olio -luokka on Object -luokan alaluokka, koska kaikki luokat, joilla on
+olioesiintymiä ovat Object -luokan alaluokkia. Listan luomisen jälkeen luodaan
+viittaus objektit oliot-taulukkoon. Viittaus ei kumminkaan pysty muuttamaan
+taulukkoa ylemmän luokan taulukoksi vaan tämä tulisi konstruoida uudelleen.
+Ohjelman ajo siis keskeytyy ajonaikaiseen virheeseen jossa objektit
+viittauksella yritetään ylikirjoittaa Object -luokan olio taulukkoon, jossa voi
+olla vain Olio -luokkaa tai tämän aliluokkia, jolloin luokkaviittauksen
+invarianssi ei päde.
+
+Koodi voidaan korjata toimivaksi kirjoittamalla rivi 3 seuraavalla tavalla:
+
+\begin{javacode}
+Object[] objektit = new Object[]{oliot[0]};
+\end{javacode}
+
+Jolloin objektit viittaa uuteen taulukkoon, jossa voi olla mitä tahansa olioita.
+
+\section{Solmu -luokan periytymisongelmat}
+
+\label{}
+
+Ensimmäisenä ongelmana voisi olla solmujen väliset toimenpiteet. Voisi olla
+epäselvää, että onko erikoistettujen solmujen equals -metodi sama, kuin Solmu-
+luokan solmujen. Siinä tapauksessa equals -metodin palautus erikois- ja
+normaalisolmun välillä riippuisi siitä kummalta kysytään. Tämä voi olla
+ongelmallista, kun halutaan vertailla mitkä solmut ovat oikeasti samoja.
+
+Jos yritetään mallintaa vaikka tiekarttaa jota kuvataan suunnattuna graafina,
+niin solmujen erikoistaminen siinä tapauksessa, että kaupungin läpi ajaminen
+vaihtelisi riippuen siitä löytyykö kehätietä vai tuleeko autoilijan ajaa
+keskustaan. Tätä voitaisiin kuvata solmun ominaisuutena, mutta silloin tulisi
+kirjoittaa paljon suunnattuja graafeja uudelleen, koska matkan laskemiseen
+käytettävä algoritmi tulisi toimia eri tavalla.
+
+Voitaisiinkin miettiä voisiko kaupunkien läpi ajaessa parempi kuvata kaarilla ja
+merkata niihin, että matka on pidempi. Se tarkoittaisi sitä, että jokainen kaari
+joka on vaikka yhteydessä Varkauteen tulisi painottaa suuremmaksi. Nyt matkan
+laskemisalgoritmia ei tarvitsisi kirjoittaa uudestaan.
+
+\section{Periytymisratkaisujen arvioimista}
+
+\label{}
+
+\subsection{PeliObjekti matopelissä}
+
+Jos haluttaisiin tehdä PeliObjekti, jossa olisi yhtenäisenä piirteenä ainoastaan
+se, että niillä kaikilla olisi olemassa jotkin koordinaatit, jotka kertovat
+missä kohtaa pelialueella ne ovat. Tämä olisi huono ratkaisu, koska
+erikoistumista ei tapahdu tarpeeksi ja eteen tulisi peliä laajentaessa jossain
+vaiheessa invarianssiongelmia.
+
+Olisi järkevämpää tehdä rajapinta ``koordinaatillinen'', jolla merkattaisiin kaikki
+luokat joilla olisi koordinaatit. Rajapintaan voisi tehdä säännön, että jokainen
+tämän rajapinnan luokka toteuttaa erilaiset koordinaatteihin liittyvät metodit.
+Jos PeliObjekti vaikka koostuisi useasta osasta, niin annaKoordinaatit() -metodi
+voisi palauttaa esimerkiksi näiden usean osan koordinaattien vektori-keskiarvon.
+Näin useasta osasta koostuva peliobjekti voisi säilyttää oman abstraktionsa
+useampiosaisena systeeminä.
+
+\subsection{Banaani-luokka toteuttaa rajapinnan Painovoima}
+
+Jos Banaani-luokka toteuttaa rajapinnan painovoima, niin voidaan kohdata
+ongelmia pelimoottorin kanssa. Fysiikan lakien mukaan painovoima, on enemmänkin
+massallisten kappaleiden väliseen vuorovaikutukseen liittyvä ominaisuus. Tämä
+ratkaisu rajaa pelimekaniikan tilanteeseen, jossa painovoima voi tapahtua vain
+alaspäin. Lisäksi Painovoima rajapinta tekisi pelimoottorin kannalta hyvin vähän
+asioita: lähinnä määräisi, että tähään olioon vaikuttaisi alaspäin suuntautuva
+kiihtyvyys.
+
+Koska kaikki kappaleet luonnossa kiihtyvät yhtä nopeasti alaspäin, niin
+mielekkäämpää olisi vain tehdä luokka Kappale, johon olisi sisäänkirjoitettuna
+painovoiman aiheuttama kiihtyvyys vektorina.
+
+\subsection{Ympyrä perii ellipsin}
+
+Ympyrä on ellipsin erikoistapaus, jossa säteen suuruus pysyy vakiona. Jos
+halutaan mallintaa ympyrää matemaattisesti, niin tämä voi olla hyvä idea.
+Toisaalta näin tehdessä laskennallinen rutiini hidastuu, koska jokaisen ympyrän
+kuvaaminen ellipsinä on hitaampaa, kuin että tehtäisiin oma Ympyrä-luokka.
+Omassa Ympyrä -luokassa voitaisiin laskentaa nopeuttaa ja erikoistaa.
+
+\subsection{Ellipsi perii ympyrän}
+
+Ellipsin periessä ympyrän erikoistaminen tapahtuu toisin. Tässä tilanteessa
+ympyrän käsitettä yleistetään lisäämällä siihen ominaisuuksia niin, että
+ellipsille ominaiset piirteet voidaan mallintaa. Tämä on hyvä idea, koska
+ellipsillä on paljon ominaisuuksia, jotka ovat samankaltaisia ympyrän kanssa:
+esim. keskeissäde ja keskipiste.
+
+\subsection{Neperin luku peritään luokasta Number}
+
+Luonnon vakioiden tai matemaattisten tunnuslukujen tallentaminen kannattaa tehdä
+joko omaksi singulaariseksi olioksi tai Number -luokan staattiseksi
+ominaisuudeksi. Neper -olioita ei tarvita laskutoimituksissa useita kappaleita,
+joten tällainen periminen on aivan turhaa.
+
+\subsection{Stack perii Vector -luokan}
+
+Stack -luokalla halutaan lisätä Vector -luokkaan ominaisuus poistaa viimeinen
+jäsen tai lisätä uusi jäsen ensimmäiseksi listassa. Vector -luokassa jäseniä
+poistetaan tietyistä indekseistä ja uusi jäsen lisätään aina viimeiseksi. Koska
+Stack -luokassa halutaan käyttää Vector luokan toiminnallisuutta periminen on
+perusteltua. 
+
+Stack -luokka voisi periä myös jonkin muun List -luokan, jolloin pystyttäisiin
+muodostamaan sama toiminnallisuus. Tähän voitaisiin päätyä, jos Stack -luokan
+käytännöt eivät muistuttaisi niin paljon Vector -luokkaa.
