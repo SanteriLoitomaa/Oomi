@@ -3,75 +3,180 @@
 
 \section{a-kohta}
 \label{a-kohta}
-Määrittelyn muutoksen aloittaisin metodista lisääSolmu, koska solmuja ei enää
-luoda irrallisina vaan osana muita prosesseja, voi sen tyypin vaihtaa privateksi.
+Alla valmiskoodista otettu ympyrän piirämismetodi ja sen määritys.
 \begin{javacode}
 /**
-* @.pre leima != null && !sisältääSolmun(leima)
-* @.post RESULT.sisältääSolmun(leima) &
-* RESULT.poistaSolmu(leima).equals(this)
+* Piirtää tietyn värisen joko kokonaan väritetyn tai onton ympyrän, siten että annettu piste on keskipiste.
+* @.pre koko>=0.0
+* @.post Piirtää ympyrän annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko kokonaan väritettynä tai
+* pelkillä reunoilla.
 */
-private lisääSolmu(String leima)
+  public void piirräPallukka(Point p, Color väri, double koko, boolean täytetty, GraphicsContext canvas) {
+        if (täytetty){
+            if (debuggaus) System.out.println("Piirretään täytetty " + (koko < 15 ? "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
+            setFill(väri);
+            canvas.fillOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
+        } else {
+            if (debuggaus) System.out.println("Piirretään ontto " + (koko < 15 ? "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
+            canvas.setLineWidth(2);
+            setStroke(väri);
+            canvas.strokeOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
+        }
+    }
 \end{javacode}
-Vaihtoehtoisesti tyypin voi pitää publicina, jos metodia kuitenkin haluaa luokan
-ulkopuolelta kutsua.
 
-Tärkeämpi osuus on muuttaa SuunnattuGraafi luokan constructoria siten, että
-uutta graafia luodessa pitää sille antaa syötteenä luotava solmu, josta
-rakentaminen lähtee liikkeelle (ns. juurisolmu).
-
+Alla valmiskoodista otettu neliön piirtämismetodi ja sen määrittely.
+Muutin sen toimintaa siten että se ottaa vastaan keskipisteen ylä ja alakulman sijasta
+ja koon, niinkuin tehtävänannossa vaadittiin.
 \begin{javacode}
 /**
-* @.pre juuri != null
-* @.post solmumäärä() == 1 & kaarimäärä() == 0 &
-*        RESULT.sisältääSolmun(juuri) &
-*        RESULT.poistaSolmu(juuri).equals(this)
+* Piirtää tietyn värisen joko kokonaan väritetyn tai onton neliön, siten että annettu piste on keskipiste.
+* @.pre koko>=0.0
+* @.post Piirtää neliön annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko kokonaan väritettynä tai
+* pelkillä reunoilla.
 */
-public SuunnattuGraafi(String juuri)
+    public void piirräLaatikko(Point p, Double koko, Color väri, boolean täytetty, GraphicsContext canvas) {
+        if (täytetty) {
+            if (debuggaus) System.out.println("Piirretään täytetty laatikko pisteiden " + (int)(p.x - koko/2) + "," + (int)(p.y - koko/2) + " ja " + (int)(p.x + koko/2) + "," + (int)(p.y + koko/2) + " välille");
+            setFill(väri);
+            canvas.fillRect(p.x - koko/2, p.y - koko/2, koko, koko);
+        } else {
+            if (debuggaus) System.out.println("Piirretään ontto laatikko pisteiden " + (int)(p.x - koko/2) + "," + (int)(p.y - koko/2) + " ja " + (int)(p.x + koko/2) + "," + (int)(p.y + koko/2) + " välille");
+            canvas.setLineWidth(2);
+            setStroke(väri);
+            canvas.strokeRect(p.x - koko/2, p.y - koko/2, koko, koko);
+        }
+    }
 \end{javacode}
-Konstruktori siis kutsuu aiemmin muokattua lisääSolmu(leima) metodia ja luo
-sen pohjalta juurisolmun.
 
-Uuden kaaren lisäämisessä pitää huomioida, että kohdejuuren ei ole pakko olla vielä
-olemassa, vaan se voidaan luoda kaaren yhteydessä, mutta muita muutoksia metodi ei
-juuri vaadi.
+Alla valmiskoodista otettu kolmionpiirtämismetodi ja sen määrittely, koodi ei täyttänyt
+tehtävänannon vaatimuksia joten päivitin sen ottamaan vastaan etukäteen määritetyn värin ja
+tiedon siitä onko se ontto voi väritetty.
 \begin{javacode}
 /**
-* @.pre (lähtöleima != null & tuloleima != null) &&
-* sisältääSolmun(lähtöleima) & !sisältääKaaren(lähtöleima, tuloleima)
-* @.post RESULT.sisältääKaaren(lähtöleima, tuloleima) &
-* RESULT.poista(lähtöleima, tuloleima).equals(this) &
-* RESULT.annaPaino(lähtöleima, tuloleima) == paino &
-* if(!sisältääSolmun(tuloleima))  RESULT.sisältääSolmun(tuloleima) &
-*                                 RESULT.poistaSolmu(tuloleima).equals(this)
+* Piirtää tietyn värisen joko kokonaan väritetyn tai onton kolmion, siten että annettu piste on keskipiste.
+* @.pre koko>=0.0
+* @.post Piirtää kolmion annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko kokonaan väritettynä tai
+* pelkillä reunoilla.
 */
-public SuunnattuGraafi lisääKaari(String lähtöleima, String tuloleima,
-double paino)
+    public void piirräKolmio(Point keski, Color väri, boolean täytetty, double koko, GraphicsContext canvas) {
+        Point piste1 = kaarelta(keski, Math.PI * 1 / 6, koko / 2 / 37 * 50);
+        Point piste2 = kaarelta(keski, Math.PI * 5 / 6, koko / 2 / 37 * 50);
+        Point piste3 = kaarelta(keski, Math.PI * 9 / 6, koko / 2 / 37 * 50);
+
+        int siirtymäY = keski.y - (piste2.y + piste3.y) / 2;
+        piste1 = piste1.add(0, siirtymäY);
+        piste2 = piste2.add(0, siirtymäY);
+        piste3 = piste3.add(0, siirtymäY);
+    
+    if (täytetty){
+      setFill(väri);
+      canvas.fillPolygon(new double[]{piste1.x, piste2.x, piste3.x}, new double[]{piste1.y, piste2.y, piste3.y}, 3);
+    } else{
+      canvas.setLineWidth(2);
+            setStroke(väri);
+            canvas.strokePolygon(new double[]{piste1.x, piste2.x, piste3.x}, new double[]{piste1.y, piste2.y, piste3.y}, 3);
+    }
+        
+    }
 \end{javacode}
-Jos tuloleima nimistä solmua ei ole vielä olemassa metodi luo sellaisen, jatkaen
-sitten toimintaansa normaalisti. Jos solmu on jo olemassa toiminta ei eroa aiemmasta.
 
 
 \section{b-kohta}
 \label{b-kohta}
-Luokan SuunnattuGraafi nimi kannattaisi alkajaisiksi muuttaa, esim. SuunnatonGraafi,
-vastaavasti kaikki metodit jotka viittaavat tähän nimeen yms. tulisi muuttaa viitaamaan
-uuteen nimeen. Terminologian selkeyttämiseksi vaihtaisin myös muuttujat lähtöleima ja
-tuloleima, vaikkapa korvaaviksi päätysolmu1 ja päätysolmu2, kuvastamaan ettei ole alkua
-ja loppua vaan kaaren kaksi päätyä.
-
-Terminologian muutosten lisäksi on luokassa vain kaksi metodia jotka ovat kiinnostuneita
-kaaren edeltäjist ja seuraajista, metodit Solmujoukko edeltjät & Solmujoukko seuraajat.
-Nämä voisi poistaa ja korvata uudella versiolla Solmujoukko parit
+Perusasetelman kuviot saadaan aikaan sijoittamalla piirrä-metodit piirtelypinann drawforegroundin sisään.
 \begin{javacode}
-/**
-* @.pre leima != null && sisältääSolmun(leima)
-* @.post RESULT == (solmuun linkitettyjen kaarien toisissa päissä olevat solmut)
-*/
-public Solmujoukko parit(String leima)
+    protected void drawForegroundContent(GraphicsContext canvas) {
+
+        {
+            Point keski = new Point(100, 100);
+            double koko = 32;
+            piirräLaatikko(keski, koko, CoreColor.Red, true, canvas);
+        }
+        {
+            Point keski = new Point(300, 150);
+            double koko = 80;
+            piirräKolmio(keski, CoreColor.Green, true, koko, canvas);
+        }
+        {
+            Point keski = new Point(150, 350);
+            int koko = 80; 
+            piirräPallukka(keski, CoreColor.Yellow, koko, true, canvas);
+        }
+    }
 \end{javacode}
-Solmujoukko parit palauttaa kaikki solmut, jotka ovat yhteydessä kyseiseen slomuun jo
-olemassaolevien kaarien kautta.
+
+\section{c-kohta}
+\label{c-kohta}
+Asetelma laittaa sisäkkäiset kuviot, joista sisempi on puolet pienempi ennalta määrättyihin
+sijainteihin. Kunkin kuvion lokaatio määritellään randomilla, hyväksikäyttäe switchia, varmistaen
+ettei sama ole missään kahdesti.
+
+\begin{javacode}
+Random num = new Random();
+      int x = 0;
+      int y = 0;
+      double koko = 30;
+      int kohta = num.nextInt(9);
+      ArrayList käytetyt = new ArrayList();
+      CoreColor color = CoreColor.Red;
+      for (int i = 0; i<3;i++) {
+        x = x + 50;
+        for (int j = 0; j<3;j++) {
+          y = y + 50;
+          Point p = new Point(x,y);
+          while (käytetyt.contains(kohta)) {
+            kohta = num.nextInt(9);
+          }
+          käytetyt.add(kohta);
+          switch(kohta){
+          case 0: piirräKolmio(p, color, false, koko, canvas);
+          piirräKolmio(p, color, true, koko/2, canvas);
+          break;
+          case 1: piirräKolmio(p, color, false, koko, canvas);
+          piirräPallukka(p, color, koko/2, true, canvas);
+          break;
+          case 2: piirräKolmio(p, color, false, koko, canvas);
+          piirräLaatikko(p, koko/2, color, true, canvas);
+          break;
+          case 3: piirräPallukka(p, color, koko, false, canvas);
+          piirräKolmio(p, color, true, koko/2, canvas);
+          break;
+          case 4: piirräPallukka(p, color, koko, false, canvas);
+          piirräPallukka(p, color, koko/2, true, canvas);
+          break;
+          case 5: piirräPallukka(p, color, koko, false, canvas);
+          piirräLaatikko(p, koko/2, color, true, canvas);
+          break;
+          case 6: piirräLaatikko(p, koko, color, false, canvas);
+          piirräKolmio(p, color, true, koko/2, canvas);
+          break;
+          case 7: piirräLaatikko(p, koko, color, false, canvas);
+          piirräPallukka(p, color, koko/2, true, canvas);
+          break;
+          case 8: piirräLaatikko(p, koko, color, false, canvas);
+          piirräLaatikko(p, koko/2, color, true, canvas);
+          break;
+        }
+        }
+        y = 0;
+      }
+\end{javacode}
+
+Ratkaisussa ei tarvinnut käyttää periytymistä aiempia enempää, joskin PiirtelyPinta, jolla kuviot
+piirretään perii luokan SimpleCanvas.
+
+\section{d-kohta}
+\label{d-kohta}
+Yksi tapa ratkaista tilanne on luoda uudet metodit KolmioNeliö ja Neliökolmio yms ja laittaa ne
+kutsumaan jo olemassaolevia metodeja, jolloin voidaan hyväksikäyttää jo olemassaolevia materiaaleja.
+esim.
+\begin{javacode}
+KolmioNeliö(Point p, double koko, Color color1, Color color2, boolean filled1, boolean filled2, GraphicsContext canvas)
+\end{javacode}
+Elegantimpi ratkaisu olisi uudenmallinen metodi, kenties jo olemassaolevista muokattu tai uusi, piirräMuoto,
+joka ottaisi vastaan halutun muodon (tyypit tulisi olla määritetty etukäteen), kaikki muodolle tarpeelliset tiedot
+ja myös mahdollisen sisämuodon tiedot, jotka nulleiksi jätettyinä tarkoittaisivat ettei sisämuotoa tule.
 
 
 Tekijänä Tommi Heikkinen (517749)
