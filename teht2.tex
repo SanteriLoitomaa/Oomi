@@ -78,12 +78,10 @@ piste on keskipiste.
         Point piste1 = kaarelta(keski, Math.PI * 1 / 6, koko / 2 / 37 * 50);
         Point piste2 = kaarelta(keski, Math.PI * 5 / 6, koko / 2 / 37 * 50);
         Point piste3 = kaarelta(keski, Math.PI * 9 / 6, koko / 2 / 37 * 50);
-
         int siirtymäY = keski.y - (piste2.y + piste3.y) / 2;
         piste1 = piste1.add(0, siirtymäY);
         piste2 = piste2.add(0, siirtymäY);
         piste3 = piste3.add(0, siirtymäY);
-    
     if (täytetty){
       setFill(väri);
       canvas.fillPolygon(new double[]{piste1.x, piste2.x, piste3.x}, new
@@ -98,14 +96,12 @@ piste on keskipiste.
     }
 \end{javacode}
 
-
 \section{b-kohta}
 \label{b-kohta}
 Perusasetelman kuviot saadaan aikaan sijoittamalla piirrä-metodit piirtelypinann
 drawforegroundin sisään.
 \begin{javacode}
     protected void drawForegroundContent(GraphicsContext canvas) {
-
         {
             Point keski = new Point(100, 100);
             double koko = 32;
@@ -180,7 +176,6 @@ Random num = new Random();
         y = 0;
       }
 \end{javacode}
-
 Ratkaisussa ei tarvinnut käyttää periytymistä aiempia enempää, joskin
 PiirtelyPinta, jolla kuviot piirretään perii luokan SimpleCanvas.
 
@@ -198,6 +193,5 @@ Elegantimpi ratkaisu olisi uudenmallinen metodi, kenties jo olemassaolevista
 muokattu tai uusi, piirräMuoto, joka ottaisi vastaan halutun muodon (tyypit tulisi
 olla määritetty etukäteen), kaikki muodolle tarpeelliset tiedot ja myös mahdollisen
 sisämuodon tiedot, jotka nulleiksi jätettyinä tarkoittaisivat ettei sisämuotoa tule.
-
 
 Tekijänä Tommi Heikkinen (517749)
