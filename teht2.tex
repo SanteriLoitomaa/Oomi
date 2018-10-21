@@ -6,18 +6,23 @@
 Alla valmiskoodista otettu ympyrän piirämismetodi ja sen määritys.
 \begin{javacode}
 /**
-* Piirtää tietyn värisen joko kokonaan väritetyn tai onton ympyrän, siten että annettu piste on keskipiste.
+* Piirtää tietyn värisen joko kokonaan väritetyn tai onton ympyrän, siten että annettu
+  piste on keskipiste.
 * @.pre koko>=0.0
-* @.post Piirtää ympyrän annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko kokonaan väritettynä tai
+* @.post Piirtää ympyrän annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko
+  kokonaan väritettynä tai
 * pelkillä reunoilla.
 */
-  public void piirräPallukka(Point p, Color väri, double koko, boolean täytetty, GraphicsContext canvas) {
+  public void piirräPallukka(Point p, Color väri, double koko, boolean täytetty,
+  GraphicsContext canvas) {
         if (täytetty){
-            if (debuggaus) System.out.println("Piirretään täytetty " + (koko < 15 ? "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
+            if (debuggaus) System.out.println("Piirretään täytetty " + (koko < 15 ?
+            "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
             setFill(väri);
             canvas.fillOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
         } else {
-            if (debuggaus) System.out.println("Piirretään ontto " + (koko < 15 ? "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
+            if (debuggaus) System.out.println("Piirretään ontto " + (koko < 15 ?
+            "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
             canvas.setLineWidth(2);
             setStroke(väri);
             canvas.strokeOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
@@ -30,18 +35,25 @@ Muutin sen toimintaa siten että se ottaa vastaan keskipisteen ylä ja alakulman
 ja koon, niinkuin tehtävänannossa vaadittiin.
 \begin{javacode}
 /**
-* Piirtää tietyn värisen joko kokonaan väritetyn tai onton neliön, siten että annettu piste on keskipiste.
+* Piirtää tietyn värisen joko kokonaan väritetyn tai onton neliön, siten että annettu
+  piste on keskipiste.
 * @.pre koko>=0.0
-* @.post Piirtää neliön annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko kokonaan väritettynä tai
+* @.post Piirtää neliön annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko
+  kokonaan väritettynä tai
 * pelkillä reunoilla.
 */
-    public void piirräLaatikko(Point p, Double koko, Color väri, boolean täytetty, GraphicsContext canvas) {
+    public void piirräLaatikko(Point p, Double koko, Color väri, boolean täytetty,
+    GraphicsContext canvas) {
         if (täytetty) {
-            if (debuggaus) System.out.println("Piirretään täytetty laatikko pisteiden " + (int)(p.x - koko/2) + "," + (int)(p.y - koko/2) + " ja " + (int)(p.x + koko/2) + "," + (int)(p.y + koko/2) + " välille");
+            if (debuggaus) System.out.println("Piirretään täytetty laatikko pisteiden "
+            + (int)(p.x - koko/2) + "," + (int)(p.y - koko/2) + " ja " +
+            (int)(p.x + koko/2) + "," + (int)(p.y + koko/2) + " välille");
             setFill(väri);
             canvas.fillRect(p.x - koko/2, p.y - koko/2, koko, koko);
         } else {
-            if (debuggaus) System.out.println("Piirretään ontto laatikko pisteiden " + (int)(p.x - koko/2) + "," + (int)(p.y - koko/2) + " ja " + (int)(p.x + koko/2) + "," + (int)(p.y + koko/2) + " välille");
+            if (debuggaus) System.out.println("Piirretään ontto laatikko pisteiden " +
+            (int)(p.x - koko/2) + "," + (int)(p.y - koko/2) + " ja " +
+            (int)(p.x + koko/2) + "," + (int)(p.y + koko/2) + " välille");
             canvas.setLineWidth(2);
             setStroke(väri);
             canvas.strokeRect(p.x - koko/2, p.y - koko/2, koko, koko);
@@ -49,17 +61,20 @@ ja koon, niinkuin tehtävänannossa vaadittiin.
     }
 \end{javacode}
 
-Alla valmiskoodista otettu kolmionpiirtämismetodi ja sen määrittely, koodi ei täyttänyt
-tehtävänannon vaatimuksia joten päivitin sen ottamaan vastaan etukäteen määritetyn värin ja
-tiedon siitä onko se ontto voi väritetty.
+Alla valmiskoodista otettu kolmionpiirtämismetodi ja sen määrittely, koodi ei
+täyttänyt tehtävänannon vaatimuksia joten päivitin sen ottamaan vastaan etukäteen
+määritetyn värin ja tiedon siitä onko se ontto voi väritetty.
 \begin{javacode}
 /**
-* Piirtää tietyn värisen joko kokonaan väritetyn tai onton kolmion, siten että annettu piste on keskipiste.
+* Piirtää tietyn värisen joko kokonaan väritetyn tai onton kolmion, siten että annettu
+piste on keskipiste.
 * @.pre koko>=0.0
-* @.post Piirtää kolmion annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko kokonaan väritettynä tai
+* @.post Piirtää kolmion annetulla värillä, koolla, sijainnilla (keskipisteenä) ja
+  joko kokonaan väritettynä tai
 * pelkillä reunoilla.
 */
-    public void piirräKolmio(Point keski, Color väri, boolean täytetty, double koko, GraphicsContext canvas) {
+    public void piirräKolmio(Point keski, Color väri, boolean täytetty, double koko,
+    GraphicsContext canvas) {
         Point piste1 = kaarelta(keski, Math.PI * 1 / 6, koko / 2 / 37 * 50);
         Point piste2 = kaarelta(keski, Math.PI * 5 / 6, koko / 2 / 37 * 50);
         Point piste3 = kaarelta(keski, Math.PI * 9 / 6, koko / 2 / 37 * 50);
@@ -71,11 +86,13 @@ tiedon siitä onko se ontto voi väritetty.
     
     if (täytetty){
       setFill(väri);
-      canvas.fillPolygon(new double[]{piste1.x, piste2.x, piste3.x}, new double[]{piste1.y, piste2.y, piste3.y}, 3);
+      canvas.fillPolygon(new double[]{piste1.x, piste2.x, piste3.x}, new
+      double[]{piste1.y, piste2.y, piste3.y}, 3);
     } else{
       canvas.setLineWidth(2);
             setStroke(väri);
-            canvas.strokePolygon(new double[]{piste1.x, piste2.x, piste3.x}, new double[]{piste1.y, piste2.y, piste3.y}, 3);
+            canvas.strokePolygon(new double[]{piste1.x, piste2.x, piste3.x},
+            new double[]{piste1.y, piste2.y, piste3.y}, 3);
     }
         
     }
@@ -84,7 +101,8 @@ tiedon siitä onko se ontto voi väritetty.
 
 \section{b-kohta}
 \label{b-kohta}
-Perusasetelman kuviot saadaan aikaan sijoittamalla piirrä-metodit piirtelypinann drawforegroundin sisään.
+Perusasetelman kuviot saadaan aikaan sijoittamalla piirrä-metodit piirtelypinann
+drawforegroundin sisään.
 \begin{javacode}
     protected void drawForegroundContent(GraphicsContext canvas) {
 
@@ -108,9 +126,9 @@ Perusasetelman kuviot saadaan aikaan sijoittamalla piirrä-metodit piirtelypinan
 
 \section{c-kohta}
 \label{c-kohta}
-Asetelma laittaa sisäkkäiset kuviot, joista sisempi on puolet pienempi ennalta määrättyihin
-sijainteihin. Kunkin kuvion lokaatio määritellään randomilla, hyväksikäyttäe switchia, varmistaen
-ettei sama ole missään kahdesti.
+Asetelma laittaa sisäkkäiset kuviot, joista sisempi on puolet pienempi ennalta
+määrättyihin sijainteihin. Kunkin kuvion lokaatio määritellään randomilla,
+hyväksikäyttäe switchia, varmistaen ettei sama ole missään kahdesti.
 
 \begin{javacode}
 Random num = new Random();
@@ -163,20 +181,23 @@ Random num = new Random();
       }
 \end{javacode}
 
-Ratkaisussa ei tarvinnut käyttää periytymistä aiempia enempää, joskin PiirtelyPinta, jolla kuviot
-piirretään perii luokan SimpleCanvas.
+Ratkaisussa ei tarvinnut käyttää periytymistä aiempia enempää, joskin
+PiirtelyPinta, jolla kuviot piirretään perii luokan SimpleCanvas.
 
 \section{d-kohta}
 \label{d-kohta}
-Yksi tapa ratkaista tilanne on luoda uudet metodit KolmioNeliö ja Neliökolmio yms ja laittaa ne
-kutsumaan jo olemassaolevia metodeja, jolloin voidaan hyväksikäyttää jo olemassaolevia materiaaleja.
+Yksi tapa ratkaista tilanne on luoda uudet metodit KolmioNeliö ja
+Neliökolmio yms ja laittaa ne kutsumaan jo olemassaolevia metodeja,
+jolloin voidaan hyväksikäyttää jo olemassaolevia materiaaleja.
 esim.
 \begin{javacode}
-KolmioNeliö(Point p, double koko, Color color1, Color color2, boolean filled1, boolean filled2, GraphicsContext canvas)
+KolmioNeliö(Point p, double koko, Color color1, Color color2, boolean
+filled1, boolean filled2, GraphicsContext canvas)
 \end{javacode}
-Elegantimpi ratkaisu olisi uudenmallinen metodi, kenties jo olemassaolevista muokattu tai uusi, piirräMuoto,
-joka ottaisi vastaan halutun muodon (tyypit tulisi olla määritetty etukäteen), kaikki muodolle tarpeelliset tiedot
-ja myös mahdollisen sisämuodon tiedot, jotka nulleiksi jätettyinä tarkoittaisivat ettei sisämuotoa tule.
+Elegantimpi ratkaisu olisi uudenmallinen metodi, kenties jo olemassaolevista
+muokattu tai uusi, piirräMuoto, joka ottaisi vastaan halutun muodon (tyypit tulisi
+olla määritetty etukäteen), kaikki muodolle tarpeelliset tiedot ja myös mahdollisen
+sisämuodon tiedot, jotka nulleiksi jätettyinä tarkoittaisivat ettei sisämuotoa tule.
 
 
 Tekijänä Tommi Heikkinen (517749)
