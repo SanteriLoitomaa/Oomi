@@ -1,289 +1,221 @@
 
 \chapter{Tehtävä 4 \label{chap:Teht=0000E4v=0000E4-4}}
 
-Tehtävän tarkoituksena on luoda mallinnus OOM-kurssin aiheuttaman tuskan minimoivasta metodista.
+Tehtävän tarkoituksena oli demostroida javan metodikutsurakenteen toimintaaa ja mahdollisia rajoitteita.
+Tehtävässä on luotu maailma jossa on Hiiri, Kissa ja Hipsteri olioita. Kun kaksi oliota tapaavat tulostuu näytölle testi joka määräytyy olioiden luokan mukaan.
 
-\section{Opiskelija-luokat (kohdat a)}
+\section{Kuormitus(a)}
 
-\label{Opiskelija-luokat}
+\label{Kuormitus}
 
-Kohdassa a tuli määrittää ja toteuttaa luokat TavallinenOpiskelija ja ValeasuOpiskelija. Tulin lopputulokseen että TavallinenOpiskelija on vain Opiskelija-rajapinnan toteutus mutta ValeasuOpiskelija on nimenomaan valeasu, jonka ainoa arvo on TavallinenOpiskelija ja kaikki metodit suunnataan suoraan tälle opiskelijalle.
+Loin jokaiselle mahdolliselle olion yhdistelmälle kohtaa-metodin. 
+Kaikilla metodeilla on täysin sama nimi ja vain parametrit muuttuvat.
 
-\subsubsection{TavallinenOpiskelija-luokka}
-\label{TavallinenOpiskelija-luokka}
+\label{Olio-luokat}
 \begin{javacode}
-public class TavallinenOpiskelija implements Opiskelija {
-  String nimi;
-  int opNumero;
-  OOMTilanne oomTilanne;
-  public TavallinenOpiskelija(String nimi, int opNumero, boolean hereillä) {
-    this.nimi = nimi;
-    this.opNumero = opNumero;
-    this.oomTilanne = new OOMTilanne();
-    oomTilanne.hereillä = hereillä;
-  }
-  /**
-   * @.pre true
-   * @.post RESULT == (Palauttaa tilanneolion)
-   */
-  @Override
-  public OOMTilanne annaOOMTilanne() {
-    return oomTilanne;
-  }
-  /**
-   * Asettaa opiskelijan nimen ja op. numeron
-   * 
-   * @.pre nimi != null && opNumero>0
-   * @.post (nimi & op.numero asetettu)
-   **/
-  @Override
-  public void asetaNimiJaOpNumero(String nimi, int opNumero) {
-    this.nimi = nimi;
-    this.opNumero = opNumero;
-  }
-  /**
-   * @.pre true
-   * @.post annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä
-   *        == false && annaOOMTilanne().luennolla == false &&
-   *        (OLD(annaOOMTilanne().ilmoittautunut) || Maailma.tuskanMäärä ==
-   *        OLD(Maailma.tuskanMäärä) + 1000)
-   */
-  @Override
-  public void ilmoittauduOOMKurssille() {
-    if(!oomTilanne.ilmoittautunut) {
-      oomTilanne.ilmoittautunut = true;
-      Maailma.lisääTuskaa(1000);
-    }
-  }
-  /**
-   * @.pre annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä ==
-   *       false
-   * @.post Maailma.tuskanMäärä == OLD(Maailma.tuskanMäärä) + 10 &&
-   *        annaOOMTilanne().luennolla == true
-   */
-  @Override
-  public void osallistuLuennolle() {
-    oomTilanne.luennolla = true;
-    Maailma.lisääTuskaa(10);
-    if(oomTilanne.hereillä) {
-      Maailma.lisääTuskaa(90);
-    }
-  }
-  /**
-   * @.pre 0 ≤ aikaaLuennonAlusta < 90
-   * @.post annaOOMTilanne().hereillä == true
-   */
-  @Override
-  public void herää(int aikaaLuennonAlusta) {
-    oomTilanne.hereillä = true;
-  }
-  /**
-   * @.pre annaOOMTilanne().luennolla == true
-   * @.post annaOOMTilanne().luennolla == false && annaOOMTilanne().hereillä ==
-   *        false
-   */
-  @Override
-  public void poistuLuennolta() {
-    oomTilanne.luennolla = false;
-    oomTilanne.hereillä = false;
-  }
-  /**
-   * @.pre annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä ==
-   *       true
-   * @.post Maailma.tuskanMäärä == OLD(tuskanMäärä) + 90 -
-   *        hereilläAlkaenMinuutista && annaOOMTilanne().hereillä == true
-   */
-  @Override
-  public void vastaaKysymykseen(int aikaaLuennonAlusta) {
-    herää(aikaaLuennonAlusta);
-    Maailma.lisääTuskaa(90-aikaaLuennonAlusta);
-  }
+public class Hipsteri extends Olio {
+	public Hipsteri() {}
+	
+	public void kohtaa(Hipsteri h) {
+		System.out.println("Hipsteri kohtaa hipsterin");
+	}
+    public void kohtaa(Kissa k) {
+    	System.out.println("Hipsteri kohtaa eläimen");
+	}
+    public void kohtaa(Hiiri h) {
+    	System.out.println("Hipsteri kohtaa eläimen");
+	}
+}
+public class Kissa extends Olio{
+	public Kissa() {}
+	
+	public void kohtaa(Hipsteri h) {
+		System.out.println("Hipsteri kohtaa eläimen");
+	}
+	public void kohtaa(Kissa k) {
+		System.out.println("Kissoja syntyy mahdollisesti nyt");
+	}
+	public void kohtaa(Hiiri h) {
+		System.out.println("Hiiri syödään");
+	}
+}
+public class Hiiri extends Olio {
+	public Hiiri() {}
+	
+	public void kohtaa(Hipsteri h) {
+		System.out.println("Hipsteri kohtaa eläimen");
+	}
+	public void kohtaa(Hiiri h) {
+		System.out.println("Hiiriä syntyy mahdollisesti nyt");
+	}
+	public void kohtaa(Kissa k) {
+		System.out.println("Hiiri syödään");
+	}
 }
 \end{javacode}
+Ja sitten yksin kertainen tarkistus että koodi toimii niin kuin ajattelin.
 
-\subsubsection{ValeasuOpiskelija-luokka}
-\label{ValeasuOpiskelija-luokka}
+\label{Koodin testaus}
 \begin{javacode}
-public class ValeasuOpiskelija implements Opiskelija {
-  Opiskelija opiskelija;
-  public ValeasuOpiskelija(Opiskelija opiskelija) {
-    this.opiskelija = opiskelija;
-  }
-  /**
-   * @.pre true
-   * @.post RESULT == (Palauttaa tilanneolion)
-   */
-  @Override
-  public OOMTilanne annaOOMTilanne() {
-    return opiskelija.annaOOMTilanne();
-  }
-  /**
-   * Asettaa opiskelijan nimen ja op. numeron
-   * 
-   * @.pre nimi != null && opNumero>0
-   * @.post (nimi & op.numero asetettu)
-   **/
-  @Override
-  public void asetaNimiJaOpNumero(String nimi, int opNumero) {
-    opiskelija.asetaNimiJaOpNumero(nimi, opNumero);
-  }
-  /**
-   * @.pre true
-   * @.post annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä
-   *        == false && annaOOMTilanne().luennolla == false &&
-   *        (OLD(annaOOMTilanne().ilmoittautunut) || Maailma.tuskanMäärä ==
-   *        OLD(Maailma.tuskanMäärä) + 1000)
-   */
-  @Override
-  public void ilmoittauduOOMKurssille() {
-    opiskelija.ilmoittauduOOMKurssille();
-  }
-  /**
-   * @.pre annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä ==
-   *       false
-   * @.post Maailma.tuskanMäärä == OLD(Maailma.tuskanMäärä) + 10 &&
-   *        annaOOMTilanne().luennolla == true
-   */
-  @Override
-  public void osallistuLuennolle() {
-    opiskelija.osallistuLuennolle();
-  }
-  /**
-   * @.pre 0 ≤ aikaaLuennonAlusta < 90
-   * @.post annaOOMTilanne().hereillä == true
-   */
-  @Override
-  public void herää(int aikaaLuennonAlusta) {
-    opiskelija.herää(aikaaLuennonAlusta);
-  }
-  /**
-   * @.pre annaOOMTilanne().luennolla == true
-   * @.post annaOOMTilanne().luennolla == false && annaOOMTilanne().hereillä ==
-   *        false
-   */
-  @Override
-  public void poistuLuennolta() {
-    opiskelija.poistuLuennolta();
-  }
-  /**
-   * @.pre annaOOMTilanne().ilmoittautunut == true && annaOOMTilanne().hereillä ==
-   *       true
-   * @.post Maailma.tuskanMäärä == OLD(tuskanMäärä) + 90 -
-   *        hereilläAlkaenMinuutista && annaOOMTilanne().hereillä == true
-   */
-  @Override
-  public void vastaaKysymykseen(int aikaaLuennonAlusta) {
-    opiskelija.vastaaKysymykseen(aikaaLuennonAlusta);
-  }
+public static void main(String[]args) {
+    	Hipsteri harri = new Hipsteri();
+    	Hipsteri tiina = new Hipsteri();
+    	Hiiri pip = new Hiiri();
+    	Kissa misu = new Kissa();
+    	harri.kohtaa(misu);
+    	pip.kohtaa(harri);
+    	misu.kohtaa(pip);
+    	tiina.kohtaa(harri);
+      }
+\end{javacode}
+
+\section{Yliluokan käyttö(b)}
+
+\label{Yliluokan käyttö}
+ Seuraavaksi laitoin olioita taulukkoon ja valitsin kahdesta taulukon indeksista olion ja laitoin ne kohtaamaan.
+ \begin{javacode}
+public class Maailma {
+	public Olio[] map;
+	
+    public Maailma() {
+    	map = new Olio[10];
+    }
+    public void lisää(Olio o,int i) {
+    	map[i]=o;
+    }
+    public void poista(int i) {
+    	map[i]=null;
+    }
+    public Olio get(int i) {
+    	return map[i];
+    }
+     public static void main(String[]args) {
+    	
+    	Maailma m = new Maailma();
+    	Hipsteri harri = new Hipsteri();
+    	Hipsteri tiina = new Hipsteri();
+    	Hiiri pip = new Hiiri();
+    	Hiiri pup = new Hiiri();
+    	Kissa misu = new Kissa();
+    	Kissa kisu = new Kissa();
+    	
+    	m.lisää(harri, 0);
+    	m.lisää(tiina, 1);
+    	m.lisää(pip, 2);
+    	m.lisää(misu, 3);
+    	m.lisää(pup, 4);
+    	m.lisää(kisu, 5);
+  
+    	m.get(0).kohtaa(m.get(1));
+    	m.get(0).kohtaa(m.get(2));
+    	m.get(0).kohtaa(m.get(3));
+    	m.get(2).kohtaa(m.get(4));
+    	m.get(2).kohtaa(m.get(3));
+    	m.get(3).kohtaa(m.get(3));
+    	m.get(3).kohtaa(m.get(1));
+    }
+    
+\end{javacode}
+
+Tässä tilanteessa kohtaa-metodit eivät toimi sellaisenaan sillä parametri on
+olio-tyyppisenä. Tässä tilanteessa voitaisiin dynaamisesti muuttaa parametrin tyyppiä, mutta
+tämä toimii vain jos parametrin tyyppi on ennestään tiedossa. Itse tekisin yläluokkaan yhden metodin joka tarkistaa molempien 
+olioden tyypit. 
+
+\begin{javacode}
+public void kohtaa(Olio o) {
+		if(this instanceof Kissa) {
+			if(o instanceof Kissa) {
+				System.out.println("Kissoja syntyy mahdollisesti nyt");
+			}else if(o instanceof Hiiri) {
+				System.out.println("Kissa syö hiiren");
+		}else if(o instanceof Hipsteri) {
+			System.out.println("Hipsteri kohtaa eläimen");
+	    }
+	} if(this instanceof Hiiri) {
+		if(o instanceof Kissa) {
+			System.out.println("Kissa syö hiiren");
+		}else if(o instanceof Hiiri) {
+			System.out.println("Hiiriä syntyy mahdollisesti nyt");
+	}else if(o instanceof Hipsteri) {
+		System.out.println("Hipsteri kohtaa eläimen");
+}
+	} if(this instanceof Hipsteri) {
+		if(o instanceof Hipsteri) {
+			System.out.println("Hipsteri kohtaa hipsterin");
+		}else {
+			System.out.println("Hipsteri kohtaa eläimen");
+		}
+		
+		}
 }
 \end{javacode}
 
 
 
-\section{OpiskelijaAllas-luokka (kohta c)}
-
-\label{OpiskelijaAllas-luokka}
-
-Kohdassa c pyydetään toteuttamaan luokka, jonka avulla kierrätetään opiskelijoita, jottei kaikkien tarvitse ilmoittautua tälle tuskaa tuottavalle kurssille.
-
-\subsubsection{OpiskelijaAllas-luokka}
-\label{OpiskelijaAllas-luokka}
+\section{Vierailija(c)}
+\label{Vierailija}
 \begin{javacode}
-public class OpiskelijaAllas {
-  private static Opiskelija[] opiskelijat = new Opiskelija[0];  
-  /**
-   * Metodi joka luo uusia opiskelijoita vain tarpeen vaatiessa.
-   * @param uhriMäärä
-   * @param vuosi
-   */
-  public static void hankiOpiskelijat(int uhriMäärä, int vuosi) {
-    Opiskelija[] uusiAllas = new Opiskelija[uhriMäärä];
-    if(uhriMäärä > opiskelijat.length) {
-      for(int i = 0; i < opiskelijat.length; i++) {
-        uusiAllas[i] = opiskelijat[i];
-      }
-      for(int i = opiskelijat.length; i < uhriMäärä; i++) {
-        uusiAllas[i] = new ValeasuOpiskelija(new TavallinenOpiskelija("Uniikki Lumihiutale", 1234567 + i, false));
-      }
-    }
-    else {
-      for(int i = 0; i < uhriMäärä; i++) {
-        uusiAllas[i] = opiskelijat[i];
-      }
-    }
-    for (int i = 0; i < uhriMäärä; i++) {
-      uusiAllas[i].asetaNimiJaOpNumero("Uniikki Lumihiutale", 1234567 + i + vuosi);
-    }
-    opiskelijat = uusiAllas;
-  }  
-  /**
-   * Metodi joka luo aina uudet opiskelijat.
-   * @param uhriMäärä
-   */
-  public static void hankiOpiskelijat(int uhriMäärä) {
-    Opiskelija[] uusiAllas = new Opiskelija[uhriMäärä];
-    for (int i = 0; i<uhriMäärä; i++)
-    uusiAllas[i] = new TavallinenOpiskelija("Uniikki Lumihiutale", 1234567+i, true);
-    opiskelijat = uusiAllas;
-  }
-  /**
-   * Palauttaa opiskelijat.
-   * @return
-   */
-  public static Opiskelija[] opiskelijat() {
-    return opiskelijat;
-  }  
+interface Visitor{
+	void visit(Kissa k,Olio o);
+	void visit(Hiiri h,Olio o);
+	void visit(Hipsteri h,Olio o);
+	
 }
+
+public class OlioVisitor implements Visitor {
+
+	@Override
+	public void visit(Kissa k, Olio o) {
+			if(o instanceof Kissa) {
+				System.out.println("Kissoja syntyy mahdollisesti nyt");
+			}else if(o instanceof Hiiri) {
+				System.out.println("Kissa syö hiiren");
+		}else if(o instanceof Hipsteri) {
+			System.out.println("Hipsteri kohtaa eläimen");
+	    }
+	}
+
+	@Override
+	public void visit(Hiiri h, Olio o) {
+		if(o instanceof Kissa) {
+			System.out.println("Kissa syö hiiren");
+		}else if(o instanceof Hiiri) {
+			System.out.println("Hiiriä syntyy mahdollisesti nyt");
+	}else if(o instanceof Hipsteri) {
+		System.out.println("Hipsteri kohtaa eläimen");
+    }
+		
+	}
+
+	@Override
+	public void visit(Hipsteri h, Olio o) {
+		if(o instanceof Kissa) {
+			System.out.println("Hipsteri kohtaa eläimen");
+		}else if(o instanceof Hiiri) {
+			System.out.println("Hipsteri kohtaa eläimen");
+	}else if(o instanceof Hipsteri) {
+		System.out.println("Hipsteri kohtaa hipsterin");
+    }
+		
+	}
+
+}
+
+
 \end{javacode}
-
-
-
-\section{Opiskelija testi (kohta b ja d)}
-
-\label{Opiskelija testi}
-
-Kohdassa b testataan luokkien eroavaisuuksia. Opiskelijoita 100 per vuosi.
-
-Valeasulla pienenevä tuska.
-
-\subsubsection{TavallinenOpiskelija-luokalla}
-\label{TavallinenOpiskelija-luokalla}
+ja jokaiselle oliolle vastaanottaja metodi
 \begin{javacode}
-Tuska yhteensä: 117840
+public void Accept(OlioVisitor visitor,Olio o) {
+    	visitor.visit(this,o); 
+    	} 
+	
 \end{javacode}
 
-\subsubsection{ValeasuOpiskelija-luokalla}
-\label{ValeasuOpiskelija-luokalla}
-\begin{javacode}
-Tuska yhteensä: 108840
-\end{javacode}
 
-Altailla pienenevä tuska.
 
-\subsubsection{Ilman altaita}
-\label{Ilman altaita}
-\begin{javacode}
-Vuoden 1 tuska: 108840
-Vuoden 2 tuska: 108840
-Vuoden 3 tuska: 108840
-Vuoden 4 tuska: 108840
-Vuoden 5 tuska: 108840
-Tuska yhteensä: 544200
-\end{javacode}
 
-\subsubsection{Altailla}
-\label{Altailla}
-\begin{javacode}
-Vuoden 1 tuska: 108840
-Vuoden 2 tuska: 8840
-Vuoden 3 tuska: 8840
-Vuoden 4 tuska: 8840
-Vuoden 5 tuska: 8840
-Tuska yhteensä: 144200
-\end{javacode}
 
-ValeasuOpiskelija-allas luo vähiten tuskaa eli koodi toimii.
-
-Tekijänä Santeri Loitomaa (516587)
+Tekijänä Janina Kuosmanen (516580)
 
 \label{endofpages}
