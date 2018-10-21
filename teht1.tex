@@ -1,38 +1,152 @@
 
-\chapter{Tehtävä 1: Mato pelin mallinnus \label{chap:Teht=0000E4v=0000E4-1}}
+\chapter{Tehtävä 1 \label{chap:Teht=0000E4v=0000E4-1}}
+
+Tehtävänä on vähentää OOMKitin DemoApp4:n riippuvuutta OOMKittiin.
+
+\section{Kohta (a)}
+\label{Kohta (a)}
+
+Näitä metodeja voisi käyttää tehtävän kuvaamissa tilanteissa, kunhan on olemassa GraphicsContext canvas johon vaikuttaa. Demo käyttää SimpleCanvas-luokkaa, joka periaattessa vain helpottaa värien vaihtoa (setFill() ja setStroke()) ja muuta vastaavaa ylläpitoa.
+
+\subsubsection{Piirtävät luokat}
+\label{Piirtävät luokat}
+\begin{javacode}
+// piirtää pallukan pisteeseen p värillä väri
+  public void piirräPallukka(Point p, Color väri, double koko, boolean täytetty,
+      GraphicsContext canvas) {
+    if (täytetty){
+      if (debuggaus) System.out.println("Piirretään täytetty " + (koko < 15 ?
+          "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
+      setFill(väri);
+      canvas.fillOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
+    } else {
+      if (debuggaus) System.out.println("Piirretään ontto " + (koko < 15 ?
+         "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
+      canvas.setLineWidth(2);
+      setStroke(väri);
+      canvas.strokeOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
+    }
+  }
+  // piirtää viivaan pisteestä alku pisteeseen lopppu värillä väri
+  public void piirräViiva(Point alku, Point loppu, Color väri, GraphicsContext canvas) {
+    if (debuggaus) System.out.println("Piirretään viiva pisteestä " + alku +
+        " pisteeseen " + loppu);
+    canvas.setLineWidth(2);
+    setStroke(väri);
+    canvas.strokeLine(alku.x, alku.y, loppu.x, loppu.y);
+  }
+  // piirtää viivaan pisteestä alku pisteeseen lopppu värillä väri
+  public void piirräLaatikko(Point vasenYlä, Point oikeaAla, Color väri, boolean täytetty,
+      GraphicsContext canvas) {
+    if (täytetty) {
+      if (debuggaus) System.out.println("Piirretään täytetty laatikko pisteiden " + vasenYlä
+          + " ja " + oikeaAla + " välille");
+      setFill(väri);
+      canvas.fillRect(vasenYlä.x, vasenYlä.y, oikeaAla.sub(vasenYlä).x, 
+          oikeaAla.sub(vasenYlä).y);
+    } else {
+      if (debuggaus) System.out.println("Piirretään ontto laatikko pisteiden " + vasenYlä
+          + " ja " + oikeaAla + " välille");
+      canvas.setLineWidth(2);
+      setStroke(väri);
+      canvas.strokeRect(vasenYlä.x, vasenYlä.y, oikeaAla.sub(vasenYlä).x,
+          oikeaAla.sub(vasenYlä).y);
+    }
+  }
+  public void piirräKolmio(Point keski, double koko, GraphicsContext canvas) {
+    Point piste1 = kaarelta(keski, Math.PI * 1 / 6, koko / 2 / 37 * 50);
+    Point piste2 = kaarelta(keski, Math.PI * 5 / 6, koko / 2 / 37 * 50);
+    Point piste3 = kaarelta(keski, Math.PI * 9 / 6, koko / 2 / 37 * 50);
+
+    int siirtymäY = keski.y - (piste2.y + piste3.y) / 2;
+    piste1 = piste1.add(0, siirtymäY);
+    piste2 = piste2.add(0, siirtymäY);
+    piste3 = piste3.add(0, siirtymäY);
+
+    canvas.fillPolygon(new double[]{piste1.x, piste2.x, piste3.x}, new double[]{piste1.y,
+        piste2.y, piste3.y}, 3);
+  }
+  public void updateContent() {
+    if (kulma > 0.5) debuggaus = false;
+    kulma += 0.1;
+  }
+  // palauttaa pistettä keski ympäröivän säde-säteisen ympyrän kaarelta pisteen kulmasta
+  protected static Point kaarelta(Point keski, double kaariKulma, double säde) {
+    return keski.add(
+        (int) (säde * Math.cos(kaariKulma)),
+        (int) (säde * Math.sin(kaariKulma))
+    );
+  }
+  protected static String fyysisesti(Point p) {
+    return "kohtaan, joka on " + p.x + " cm kohteen vasemmasta reunasta ja " + p.y +
+        " cm yläreunasta.";
+  }
+  protected void drawBackgroundContent(GraphicsContext canvas) {
+    setFill(CoreColor.Black);
+    canvas.fillRect(0, 0, getWidth(), getHeight());
+  }
+  protected void drawForegroundContent(GraphicsContext canvas) {
+    Point keski1 = new Point(100, 100);
+    Point keski2 = new Point(300, 150);
+    Point keski3 = new Point(150, 350);
+
+    {
+      Point keski = keski1;
+      int kulmia = 5;
+      int kulmaHyppy = 2;
+      double kulmaLisäys = kulma;
+      double koko = 32;
+
+      if (debuggaus) System.out.println("Seuraavilla ohjeilla piirretään 5-kulmio kohtaan "
+          + fyysisesti(keski));
+      for (double i = 0; i < kulmia; i++) {
+        Point p1 = kaarelta(keski, kulmaLisäys + i / kulmia * 2 * Math.PI, koko);
+        Point p2 = kaarelta(keski, kulmaLisäys + (i + kulmaHyppy) / kulmia * 2 * Math.PI,
+            koko);
+        piirräViiva(p1, p2, CoreColor.Red, canvas);
+        piirräPallukka(p1, CoreColor.LightRed, 10, true, canvas);
+        piirräPallukka(p2, CoreColor.LightRed, 10, true, canvas);
+      }
+    }
+    {
+      Point keski = keski2;
+      int kulmia = 7;
+      int kulmaHyppy = 1;
+      double kulmaLisäys = -kulma / 2;
+      double koko = 80;
+
+      if (debuggaus) System.out.println("Seuraavilla ohjeilla piirretään 7-kulmio kohtaan "
+          + fyysisesti(keski));
+      for (double i = 0; i < kulmia; i++) {
+        Point p1 = kaarelta(keski, kulmaLisäys + i / kulmia * 2 * Math.PI, koko);
+        Point p2 = kaarelta(keski, kulmaLisäys + (i + kulmaHyppy) / kulmia * 2 * Math.PI,
+            koko);
+        piirräViiva(p1, p2, CoreColor.Red, canvas);
+        piirräPallukka(p1, CoreColor.LightRed, 10, true, canvas);
+        piirräPallukka(p2, CoreColor.LightRed, 10, true, canvas);
+      }
+    }
+    {
+      Point sijainti = keski3.add((int) (Math.cos(kulma / 2) * 180 + 100), 
+          (int) (Math.sin(kulma / 2) * 40));
+      int koko = 80;
+      Color väri = CoreColor.Orange;
+
+      if (debuggaus) System.out.println("Seuraavilla ohjeilla piirretään"+
+          " 'Clavicula Nox' kohtaan " + fyysisesti(sijainti));
+      piirräPallukka(sijainti, väri, koko, false, canvas);
+      piirräPallukka(sijainti.add(0, koko / 2), väri, koko * 2 / 3, false, canvas);
+      piirräLaatikko(sijainti.add(-koko / 2, -koko / 2 - 5), sijainti.add(koko / 2, 0),
+          CoreColor.Black, true, canvas);
+      piirräViiva(sijainti.add(0, koko * 2), sijainti.add(0, -koko / 4), väri, canvas);
+    }
+  }
+\end{javacode}
+
+\section{Kohta (b)}
+\label{Kohta (b)}
+
+Näistä metodeista ohjeiden tulostus ei olisi vaikeaa, sillä se tekee sen jo dubuggaus-booleanin ollessa true. Tietysti joitain tekstejä tulisi muokata "ohjemaisemmiksi" mutta muuten en näe ongelmaa.
 
 
-Tehtävänä oli malintaa kolme matopelin tapausta käyttötapauskaavioilla
-\section{Maton liikkuminen}
-
-\label{Madon liikkuminen}
-
-Madon liikkuminen kehyksessä tapahtuu niin että, käyttäjä antaa suunnan mihin liikutaan ja mato liikkuu jokaisella 
-tickillä vähäsen siihen suuntaan kunnes pelaaja vaihtaa suuntaa. Pelaaja ohjaa madon päätä ja madon häntä tulee perässä
-niin että jokainen hännän osa saa koordinaateiksi sitä edeltävän osan vanhan paikan.
-
-\begin{figure}
-\centering \includegraphics[width=0.5\textwidth]{kuvat/SnakeGame1}
-\label{Liikkuminen} 
-\end{figure}
-
-\section{Evään syönti}
-\label{Evään syönti}
-Kun madon pään koordinaatit ovat samat kuin evään, eväs syödään eli poistetaan kehyksestä. Mato saa pisteitä eväältä ja sen häntä kasvaa yhden pykälän. Uusi eväs asetetaan jonnekin kehykseen. 
-
-\begin{figure}
-\centering \includegraphics[width=0.5\textwidth]{kuvat/SnakeGame2}
-\label{Syönti} 
-\end{figure}
-\section{Törmäys}
-\label{Törmäys}
-Jos mato osuu kehyksen seinään se menettää pituutta ja pysähtyy kunnes sille annetaan uusi suunta. 
-\begin{figure}
-\centering \includegraphics[width=0.5\textwidth]{kuvat/SnakeGame3}
-\label{törmäysSeinään} 
-\end{figure}
-
-
-
-
-- Janina Kuosmanen (516580)
+Tekijänä Santeri Loitomaa (516587)
