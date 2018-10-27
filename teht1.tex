@@ -1,152 +1,205 @@
 
 \chapter{Tehtävä 1 \label{chap:Teht=0000E4v=0000E4-1}}
 
-Tehtävänä on vähentää OOMKitin DemoApp4:n riippuvuutta OOMKittiin.
+Tehtävässä muokataan Gorilla -pelin rakennusluokkia niin, että niihin voidaan
+toteuttaa järjestelyalgoritmeja.
 
-\section{Kohta (a)}
-\label{Kohta (a)}
+\section{Leveyden ja korkeuden mukainen järjestys}
 
-Näitä metodeja voisi käyttää tehtävän kuvaamissa tilanteissa, kunhan on olemassa GraphicsContext canvas johon vaikuttaa. Demo käyttää SimpleCanvas-luokkaa, joka periaattessa vain helpottaa värien vaihtoa (setFill() ja setStroke()) ja muuta vastaavaa ylläpitoa.
+\label{}
 
-\subsubsection{Piirtävät luokat}
-\label{Piirtävät luokat}
+Lajittelua varten muodostetaan ensiksi Rakennus -luokkaan Comparator, niin
+leveys kuin korkeusjärjestyksen muodostamiseen.
+
 \begin{javacode}
-// piirtää pallukan pisteeseen p värillä väri
-  public void piirräPallukka(Point p, Color väri, double koko, boolean täytetty,
-      GraphicsContext canvas) {
-    if (täytetty){
-      if (debuggaus) System.out.println("Piirretään täytetty " + (koko < 15 ?
-          "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
-      setFill(väri);
-      canvas.fillOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
-    } else {
-      if (debuggaus) System.out.println("Piirretään ontto " + (koko < 15 ?
-         "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
-      canvas.setLineWidth(2);
-      setStroke(väri);
-      canvas.strokeOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
-    }
-  }
-  // piirtää viivaan pisteestä alku pisteeseen lopppu värillä väri
-  public void piirräViiva(Point alku, Point loppu, Color väri, GraphicsContext canvas) {
-    if (debuggaus) System.out.println("Piirretään viiva pisteestä " + alku +
-        " pisteeseen " + loppu);
-    canvas.setLineWidth(2);
-    setStroke(väri);
-    canvas.strokeLine(alku.x, alku.y, loppu.x, loppu.y);
-  }
-  // piirtää viivaan pisteestä alku pisteeseen lopppu värillä väri
-  public void piirräLaatikko(Point vasenYlä, Point oikeaAla, Color väri, boolean täytetty,
-      GraphicsContext canvas) {
-    if (täytetty) {
-      if (debuggaus) System.out.println("Piirretään täytetty laatikko pisteiden " + vasenYlä
-          + " ja " + oikeaAla + " välille");
-      setFill(väri);
-      canvas.fillRect(vasenYlä.x, vasenYlä.y, oikeaAla.sub(vasenYlä).x, 
-          oikeaAla.sub(vasenYlä).y);
-    } else {
-      if (debuggaus) System.out.println("Piirretään ontto laatikko pisteiden " + vasenYlä
-          + " ja " + oikeaAla + " välille");
-      canvas.setLineWidth(2);
-      setStroke(väri);
-      canvas.strokeRect(vasenYlä.x, vasenYlä.y, oikeaAla.sub(vasenYlä).x,
-          oikeaAla.sub(vasenYlä).y);
-    }
-  }
-  public void piirräKolmio(Point keski, double koko, GraphicsContext canvas) {
-    Point piste1 = kaarelta(keski, Math.PI * 1 / 6, koko / 2 / 37 * 50);
-    Point piste2 = kaarelta(keski, Math.PI * 5 / 6, koko / 2 / 37 * 50);
-    Point piste3 = kaarelta(keski, Math.PI * 9 / 6, koko / 2 / 37 * 50);
+public static Comparator<Rakennus> LeveysJärjestys = new Comparator<Rakennus>() {
+	public int compare(Rakennus eka, Rakennus toka) {
+		return eka.getLeveys() - toka.getLeveys();
+	}
+};
 
-    int siirtymäY = keski.y - (piste2.y + piste3.y) / 2;
-    piste1 = piste1.add(0, siirtymäY);
-    piste2 = piste2.add(0, siirtymäY);
-    piste3 = piste3.add(0, siirtymäY);
-
-    canvas.fillPolygon(new double[]{piste1.x, piste2.x, piste3.x}, new double[]{piste1.y,
-        piste2.y, piste3.y}, 3);
-  }
-  public void updateContent() {
-    if (kulma > 0.5) debuggaus = false;
-    kulma += 0.1;
-  }
-  // palauttaa pistettä keski ympäröivän säde-säteisen ympyrän kaarelta pisteen kulmasta
-  protected static Point kaarelta(Point keski, double kaariKulma, double säde) {
-    return keski.add(
-        (int) (säde * Math.cos(kaariKulma)),
-        (int) (säde * Math.sin(kaariKulma))
-    );
-  }
-  protected static String fyysisesti(Point p) {
-    return "kohtaan, joka on " + p.x + " cm kohteen vasemmasta reunasta ja " + p.y +
-        " cm yläreunasta.";
-  }
-  protected void drawBackgroundContent(GraphicsContext canvas) {
-    setFill(CoreColor.Black);
-    canvas.fillRect(0, 0, getWidth(), getHeight());
-  }
-  protected void drawForegroundContent(GraphicsContext canvas) {
-    Point keski1 = new Point(100, 100);
-    Point keski2 = new Point(300, 150);
-    Point keski3 = new Point(150, 350);
-
-    {
-      Point keski = keski1;
-      int kulmia = 5;
-      int kulmaHyppy = 2;
-      double kulmaLisäys = kulma;
-      double koko = 32;
-
-      if (debuggaus) System.out.println("Seuraavilla ohjeilla piirretään 5-kulmio kohtaan "
-          + fyysisesti(keski));
-      for (double i = 0; i < kulmia; i++) {
-        Point p1 = kaarelta(keski, kulmaLisäys + i / kulmia * 2 * Math.PI, koko);
-        Point p2 = kaarelta(keski, kulmaLisäys + (i + kulmaHyppy) / kulmia * 2 * Math.PI,
-            koko);
-        piirräViiva(p1, p2, CoreColor.Red, canvas);
-        piirräPallukka(p1, CoreColor.LightRed, 10, true, canvas);
-        piirräPallukka(p2, CoreColor.LightRed, 10, true, canvas);
-      }
-    }
-    {
-      Point keski = keski2;
-      int kulmia = 7;
-      int kulmaHyppy = 1;
-      double kulmaLisäys = -kulma / 2;
-      double koko = 80;
-
-      if (debuggaus) System.out.println("Seuraavilla ohjeilla piirretään 7-kulmio kohtaan "
-          + fyysisesti(keski));
-      for (double i = 0; i < kulmia; i++) {
-        Point p1 = kaarelta(keski, kulmaLisäys + i / kulmia * 2 * Math.PI, koko);
-        Point p2 = kaarelta(keski, kulmaLisäys + (i + kulmaHyppy) / kulmia * 2 * Math.PI,
-            koko);
-        piirräViiva(p1, p2, CoreColor.Red, canvas);
-        piirräPallukka(p1, CoreColor.LightRed, 10, true, canvas);
-        piirräPallukka(p2, CoreColor.LightRed, 10, true, canvas);
-      }
-    }
-    {
-      Point sijainti = keski3.add((int) (Math.cos(kulma / 2) * 180 + 100), 
-          (int) (Math.sin(kulma / 2) * 40));
-      int koko = 80;
-      Color väri = CoreColor.Orange;
-
-      if (debuggaus) System.out.println("Seuraavilla ohjeilla piirretään"+
-          " 'Clavicula Nox' kohtaan " + fyysisesti(sijainti));
-      piirräPallukka(sijainti, väri, koko, false, canvas);
-      piirräPallukka(sijainti.add(0, koko / 2), väri, koko * 2 / 3, false, canvas);
-      piirräLaatikko(sijainti.add(-koko / 2, -koko / 2 - 5), sijainti.add(koko / 2, 0),
-          CoreColor.Black, true, canvas);
-      piirräViiva(sijainti.add(0, koko * 2), sijainti.add(0, -koko / 4), väri, canvas);
-    }
-  }
+public static Comparator<Rakennus> KorkeusJärjestys = new Comparator<Rakennus>() {
+	public int compare(Rakennus eka, Rakennus toka) {
+		return eka.getKorkeus() - toka.getKorkeus();
+	}
+};
 \end{javacode}
 
-\section{Kohta (b)}
-\label{Kohta (b)}
+Jos halutaan, että Arrays.sort() -metodi järjestää rakennukset ensisijaisesti
+korkeuden mukaan, niin Rakennus -luokan tulee toteuttaa Comparable -rajapinta ja
+ylikirjoittaa metodi compareTo() seuraavalla tavalla:
 
-Näistä metodeista ohjeiden tulostus ei olisi vaikeaa, sillä se tekee sen jo dubuggaus-booleanin ollessa true. Tietysti joitain tekstejä tulisi muokata "ohjemaisemmiksi" mutta muuten en näe ongelmaa.
+\begin{javacode}
+/**
+ * Paleutetaan ensisijaisesti korkeusjärjestys, mutta jos rakennukset ovat 
+ * yhtä korkeita, niin silloin palautetaan leveysjärjestys.
+ */
+@Override
+public int compareTo(Rakennus that) {
+	int korkeusjärjestys = Rakennus.KorkeusJärjestys.compare(this,that);
+	return korkeusjärjestys != 0 ? 
+		korkeusjärjestys : Rakennus.LeveysJärjestys.compare(this, that); 
+}
+\end{javacode}
 
+Jolloin tilanteet, joissa rakennukset ovat yhtä korkeita arvioidaan rakennusten
+leveyden perusteella.
 
-Tekijänä Santeri Loitomaa (516587)
+\section{Järjestysnumeron esittäminen}
+
+\label{}
+
+Ohjelmassa järjestysnumerot voidaan piirtää rakennusten alapuolelle käyttämällä
+edellisessä luvussa esiteltyä compareTo() -metodia listan järjestämisessä. Nyt
+listan sort() -metodi on tosin staattinen. Rakennusten piirtämistä voidaan
+helposti muokata näyttämään järjestysnumero kirjoittamalla
+drawForegroundContent() -metodiin muunneltu silmukka:
+
+\begin{javacode}
+ArrayList<Rakennus> järjestettyKopio = new ArrayList<>(rakennukset);
+järjestettyKopio.sort(null);
+
+for (Rakennus r : rakennukset) {
+	Rakennus skaalattu = r.skaalaa(suhdeLeveys, suhdeKorkeus);
+	piirräRakennus(paikka, skaalattu);
+	drawText(paikka.add(skaalattu.leveys / 2, -32), CoreColor.White,
+		järjestettyKopio.indexOf(r) + "#", 24, true, true); paikka =
+		paikka.add(skaalattu.leveys, 0); 
+}
+\end{javacode}
+
+Silmukkaa ennen rakennusten järjestys laitetaan piirtämistä varten muistiin.
+Tämä muistinkäyttö olisi järkevämpi tehdä jossain muussa luokassa, mutta koska
+tässä esimerkissä rakennukset on tallennettu PiirtelyPinta -luokan sisään, niin
+käytämme sitten myös PiirtelyPinta -luokkaa järjestyksen tallentamiseen.
+
+Jotta saataisiin järjestystä vaihdettua ajon aikana GorillaPiirtopinta -luokassa
+tulee myös tietää missä järjestyksessä järjestysnumero pitää esittää, joten
+tallennetaan staattiseen muuttujaan käytettävä Comparator.
+
+\begin{javacode}
+public class GorillaPiirtopinta extends PiirtelyPinta {
+    private final List<Rakennus> rakennukset;
+    private Comparator<Rakennus> järjestys = Rakennus.KorkeusJärjestys;
+    jne
+}
+\end{javacode}
+
+Ja muokataan piirtämistä hiukan:
+
+\begin{javacode}
+ArrayList<Rakennus> järjestettyKopio = new ArrayList<>(rakennukset);
+järjestettyKopio.sort(järjestys);
+
+for (Rakennus r : rakennukset) {
+	Rakennus skaalattu = r.skaalaa(suhdeLeveys, suhdeKorkeus);
+	piirräRakennus(paikka, skaalattu);
+	drawText(paikka.add(skaalattu.leveys / 2, -32), CoreColor.White,
+		järjestettyKopio.indexOf(r) + "#", 24, true, true); paikka =
+		paikka.add(skaalattu.leveys, 0); 
+}
+\end{javacode}
+
+jossa oletusjärjestyksen (null-arvon) sijaan käytetäänkin staattiseen muuttujaan
+tallennettua järjestystä (ks. rivi 2). Jäljelle jää tehdä toiminnallisuus alla
+oleviin painikkeisiin niin, että järjestystä voidaan muuttaa ajon aikana.
+
+Koska luokkarakenne ei ole erityisen eheä (edellämainittu ristiriita
+piirtämiseen tarkoitetun luokan sisälle tallennettu datarakenne), niin tehdään
+järjestäRakennukset() -metodi, jonka argumenttina välitetään oikea järjestys:
+
+\begin{javacode}
+void järjestäRakennukset(Comparator<Rakennus> c) {
+		rakennukset.sort(c); // tullaan siirtämään seuraavassa tehtävässä pois täältä
+		järjestys = c;
+}
+\end{javacode}
+
+jolloin ohjelman logiikan puolella voidaan muuttaa staattista järjestystä:
+
+\begin{javacode}
+@Override
+public List<Node> bottomBarContent() {
+	List<Node> napit = new ArrayList<Node>(Arrays.asList(
+		new Button("Järjestys #1") {
+			{ setOnAction(e -> 
+			appLogic.järjestäRakennukset(Rakennus.KorkeusJärjestys));
+		} },
+		new Button("Järjestys #2") {
+			{ setOnAction(e -> 
+			appLogic.järjestäRakennukset(Rakennus.LeveysJärjestys)); }
+		},
+		new Button("Lajittelu") {
+			{ setOnAction(e -> 
+			System.out.println("TODO")); }
+		}
+	));
+	napit.addAll(basicButtons());
+	return napit;
+}
+\end{javacode}
+
+\section{Lajittelu ajon aikana}
+
+\label{}
+
+Lisätään lajittelu-painikkeelle oma metodi, joka päivittää rakennusten
+järjestyksen. Tämä tehdään GorillaPiirtopinta ja GorillaLogic -luokkiin. Samalla
+eritellään järjestyksen ja lajittelun käsitteet toisistaan:
+
+\begin{javacode} 
+void järjestäRakennukset(Comparator<Rakennus> c) {
+		järjestys = c;
+}
+
+public void lajitteleRakennukset() {
+		rakennukset.sort(järjestys);
+}
+\end{javacode}
+
+jolloin nyt nappien toiminta kirjoitetaan näin:
+
+\begin{javacode}
+new Button("Järjestys #1") {
+    { setOnAction(e -> 
+    appLogic.järjestäRakennukset(Rakennus.KorkeusJärjestys)); }
+},
+new Button("Järjestys #2") {
+    { setOnAction(e -> 
+    appLogic.järjestäRakennukset(Rakennus.LeveysJärjestys)); }
+},
+new Button("Lajittelu") {
+    { setOnAction(e -> 
+    appLogic.lajitteleRakennukset()); }
+}
+\end{javacode}
+
+Lajiteltu näkymä on esitetty kuvassa \ref{Gorillalajitelma}.
+
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/Gorillamaisema}
+\caption{Lajittelunäkymä korkeus- ja leveysjärjestyksessä}
+\label{Gorillalajitelma} 
+\end{figure}
+
+\section{Rakennusten sekoittaminen}
+
+\label{}
+
+Jos rakennukset halutaan sekoittaa silloin, kun halutaan järjestää jo
+järjestyksessä olevaa listaa rakennuksista, niin tämä voidaan toteuttaa
+muokkaamalla lajittelu -metodia:
+
+\begin{javacode}
+public void lajitteleRakennukset() {
+	ArrayList<Rakennus> rakennuksetOld = new ArrayList<>(rakennukset);
+	rakennukset.sort(järjestys);
+	if ( rakennukset.equals(rakennuksetOld) ) {
+		Collections.shuffle(rakennukset);
+	}
+}
+\end{javacode}
+
+Jolloin rakennukset sekoitetaan vain, jos muutosta järjestykseen ei tapahdu.
+
+Tehnyt Pasi Toivanen (517487)
