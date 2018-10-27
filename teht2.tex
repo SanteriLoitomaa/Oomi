@@ -3,195 +3,240 @@
 
 \section{a-kohta}
 \label{a-kohta}
-Alla valmiskoodista otettu ympyrän piirämismetodi ja sen määritys.
+Loin luokan Kuvio, jolla on aiemmassa tehtävässä määritellyt ominaisuudet väri, täytetty,
+keskipiste ja lisäksi kulmien määrä, joka määrittää mikä kuvion tyyppi on kyseessä. Tyypit
+olivat tehtävässä enumeina YMPYRÄ, NELIÖ, KOLMIO.
 \begin{javacode}
-/**
-* Piirtää tietyn värisen joko kokonaan väritetyn tai onton ympyrän, siten että annettu
-  piste on keskipiste.
-* @.pre koko>=0.0
-* @.post Piirtää ympyrän annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko
-  kokonaan väritettynä tai
-* pelkillä reunoilla.
-*/
-  public void piirräPallukka(Point p, Color väri, double koko, boolean täytetty,
-  GraphicsContext canvas) {
-        if (täytetty){
-            if (debuggaus) System.out.println("Piirretään täytetty " + (koko < 15 ?
-            "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
-            setFill(väri);
-            canvas.fillOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
-        } else {
-            if (debuggaus) System.out.println("Piirretään ontto " + (koko < 15 ?
-            "pieni pallukka" : (int)koko+" cm - säteinen ympyrä") + " pisteeseen " + p);
-            canvas.setLineWidth(2);
-            setStroke(väri);
-            canvas.strokeOval(p.x - koko / 2, p.y - koko / 2, koko, koko);
-        }
+public class Kuvio{
+  int kulmaMaara;
+  Point keskusta;
+  Color vari;
+  double koko;
+  boolean taytetty;
+  enum Tyyppi{
+    NELIÖ, YMPYRÄ, KOLMIO
+  }
+  Tyyppi tyyppi;
+  
+  /**
+   * 
+   * Luo uuden kuvio olion, katkaisten luonnin jos kulmaMaara ei täsmää kuvioihin.
+   * @.pre kulmaMaara = 0 || 3 || 4
+   * @.post new Kuvio
+   */
+  public Kuvio(int kulmaMaara, Point keskusta, Color vari, boolean taytetty) {
+    if (kulmaMaara != 0 && kulmaMaara != 3 && kulmaMaara != 4) {
+      System.out.println("Kuvio ei ole ympyrä, neliö tai kolmio!");
+      return;
     }
+    this.kulmaMaara = kulmaMaara;
+    this.keskusta = keskusta;
+    this.vari = vari;
+    this.taytetty = taytetty;
+    if (kulmaMaara == 0) {
+      this.tyyppi = Tyyppi.YMPYRÄ;
+      this.koko = 100;
+    }
+    else if(kulmaMaara == 3){
+      this.tyyppi = Tyyppi.KOLMIO;
+      this.koko = 30;
+    }
+    else if(kulmaMaara == 4){
+      this.tyyppi = Tyyppi.NELIÖ;
+      this.koko = 60;
+    }
+  }
+  
+}
+
+\end{javacode}
+Kuviolla on etukäteen määritetty koko, jotta tehtävä täyttäisi suuruusjärjestykseen
+liittyvät ehdot.
+
+Kuviopari perii luokan kuvio ja toimii hyvin samalla tavalla, mutta sillä on lisää
+muuttujia sisemmän kuvion ominaisuuksille. Sisemmän ja ulomman kuvion kokoja muokataan
+tässä sen mukaan onko sisäkuvio sama vai eri.
+\begin{javacode}
+public class KuvioPari extends Kuvio{
+  int sisaKulmaMaara;
+  Color sisaVari;
+  double sisaKoko;
+  boolean sisaTaytetty;
+  enum Tyyppi{
+    NELIÖ, YMPYRÄ, KOLMIO
+  }
+  Tyyppi sisaTyyppi;
+  
+  /**
+   * 
+   * Luo uuden kuviopari olion, katkaisten luonnin jos kulmaMaara ei täsmää kuvioihin.
+   * @.pre kulmaMaara = 0 || 3 || 4 && sisaKulmaMaara = 0 || 3 || 4
+   * @.post new KuvioPari
+   */
+  public KuvioPari(int kulmaMaara, int sisaKulmaMaara, Point keskusta, Color vari,
+  Color sisaVari, boolean taytetty, boolean sisaTaytetty) {
+    super(kulmaMaara,keskusta,vari,taytetty);
+    if (sisaKulmaMaara != 0 && sisaKulmaMaara != 3 && sisaKulmaMaara != 4) {
+      System.out.println("Sisäkuvio ei ole ympyrä, neliö tai kolmio!");
+      return;
+    }
+    this.sisaKulmaMaara = sisaKulmaMaara;
+    this.sisaVari = sisaVari;
+    this.sisaTaytetty = sisaTaytetty;
+    if (sisaKulmaMaara == 0) {
+      this.sisaTyyppi = Tyyppi.YMPYRÄ;
+      this.sisaKoko = 100;
+    }
+    else if(kulmaMaara == 3){
+      this.sisaTyyppi = Tyyppi.KOLMIO;
+      this.sisaKoko = 30;
+    }
+    else if(kulmaMaara == 4){
+      this.sisaTyyppi = Tyyppi.NELIÖ;
+      this.sisaKoko = 60;
+    }
+    if (kulmaMaara == sisaKulmaMaara) {
+      this.koko = this.koko + 20;
+      this.sisaKoko = this.sisaKoko + 10;
+    }else {
+      this.koko = this.koko + 10;
+      this.sisaKoko = this.sisaKoko - 10;
+    }
+  }
+}
 \end{javacode}
 
-Alla valmiskoodista otettu neliön piirtämismetodi ja sen määrittely.
-Muutin sen toimintaa siten että se ottaa vastaan keskipisteen ylä ja alakulman sijasta
-ja koon, niinkuin tehtävänannossa vaadittiin.
+Koska kuviopari perii kuvion, molempia voi käyttää Kuvion metodissa vertaile,
+joka laskee kuvioiden pinta-alan ja määrittelee siten mikä on suurin.
 \begin{javacode}
-/**
-* Piirtää tietyn värisen joko kokonaan väritetyn tai onton neliön, siten että annettu
-  piste on keskipiste.
-* @.pre koko>=0.0
-* @.post Piirtää neliön annetulla värillä, koolla, sijainnilla (keskipisteenä) ja joko
-  kokonaan väritettynä tai
-* pelkillä reunoilla.
-*/
-    public void piirräLaatikko(Point p, Double koko, Color väri, boolean täytetty,
-    GraphicsContext canvas) {
-        if (täytetty) {
-            if (debuggaus) System.out.println("Piirretään täytetty laatikko pisteiden "
-            + (int)(p.x - koko/2) + "," + (int)(p.y - koko/2) + " ja " +
-            (int)(p.x + koko/2) + "," + (int)(p.y + koko/2) + " välille");
-            setFill(väri);
-            canvas.fillRect(p.x - koko/2, p.y - koko/2, koko, koko);
-        } else {
-            if (debuggaus) System.out.println("Piirretään ontto laatikko pisteiden " +
-            (int)(p.x - koko/2) + "," + (int)(p.y - koko/2) + " ja " +
-            (int)(p.x + koko/2) + "," + (int)(p.y + koko/2) + " välille");
-            canvas.setLineWidth(2);
-            setStroke(väri);
-            canvas.strokeRect(p.x - koko/2, p.y - koko/2, koko, koko);
-        }
+  /**
+   * Vertailee kahta kuviota toisiinsa koon suhteen
+   * @.post System.out.println("Toinen kuvio on isompi." || "Ensimmäinen kuvio on
+   isompi." || "Kuviot ovat yhtä suuret");
+   */
+  public void vertaile(Kuvio kuvio) {
+    double suuruus1 = 0;
+    double suuruus2 = 0;
+    if (this.tyyppi == Tyyppi.KOLMIO) {
+      suuruus1 = this.koko*this.koko*0.433;
     }
+    if (this.tyyppi == Tyyppi.YMPYRÄ) {
+      suuruus1 = (this.koko/2)*(this.koko/2)*Math.PI;
+    }
+    if (this.tyyppi == Tyyppi.NELIÖ) {
+      suuruus1 = this.koko*this.koko;
+    }
+    if (kuvio.tyyppi == Tyyppi.KOLMIO) {
+      suuruus2 = kuvio.koko*kuvio.koko*0.433;
+    }
+    if (kuvio.tyyppi == Tyyppi.YMPYRÄ) {
+      suuruus2 = (kuvio.koko/2)*(kuvio.koko/2)*Math.PI;
+    }
+    if (kuvio.tyyppi == Tyyppi.NELIÖ) {
+      suuruus2 = kuvio.koko*kuvio.koko;
+    }
+    
+    if (suuruus1 < suuruus2) {
+      System.out.println("Toinen kuvio on isompi.");
+    } else if(suuruus1 > suuruus2) {
+      System.out.println("Ensimmäinen kuvio on isompi.");
+    } else {
+      System.out.println("Kuviot ovat yhtä suuret");
+    }
+  }
+  
 \end{javacode}
 
-Alla valmiskoodista otettu kolmionpiirtämismetodi ja sen määrittely, koodi ei
-täyttänyt tehtävänannon vaatimuksia joten päivitin sen ottamaan vastaan etukäteen
-määritetyn värin ja tiedon siitä onko se ontto voi väritetty.
+Lopuksi testasin vertailun toimivuutta luomalla kuviot testi1-9 jotka ovat kukin
+joko pelkkä kuvio, kuvio joka sisältää eri kuvion kuin itsensä ja kuvio joka sisältää
+itsensä muotoisen kuvion. Testasin aluksi vartavasten test2 ja test1 kokoaeroa ja
+sitten test2 itsensä kanssa varmistaakseni vertailumetodin antavan kaikki halutut
+tulokset. Sitten testasin loput järjestyksessä, varmistaakseni niiden järjestyksen
+olevan tehtävänannon ohjeiden mukainen.
+
+Alla kutsupino ja sitten tulostus
 \begin{javacode}
-/**
-* Piirtää tietyn värisen joko kokonaan väritetyn tai onton kolmion, siten että annettu
-piste on keskipiste.
-* @.pre koko>=0.0
-* @.post Piirtää kolmion annetulla värillä, koolla, sijainnilla (keskipisteenä) ja
-  joko kokonaan väritettynä tai
-* pelkillä reunoilla.
-*/
-    public void piirräKolmio(Point keski, Color väri, boolean täytetty, double koko,
-    GraphicsContext canvas) {
-        Point piste1 = kaarelta(keski, Math.PI * 1 / 6, koko / 2 / 37 * 50);
-        Point piste2 = kaarelta(keski, Math.PI * 5 / 6, koko / 2 / 37 * 50);
-        Point piste3 = kaarelta(keski, Math.PI * 9 / 6, koko / 2 / 37 * 50);
-        int siirtymäY = keski.y - (piste2.y + piste3.y) / 2;
-        piste1 = piste1.add(0, siirtymäY);
-        piste2 = piste2.add(0, siirtymäY);
-        piste3 = piste3.add(0, siirtymäY);
-    if (täytetty){
-      setFill(väri);
-      canvas.fillPolygon(new double[]{piste1.x, piste2.x, piste3.x}, new
-      double[]{piste1.y, piste2.y, piste3.y}, 3);
-    } else{
-      canvas.setLineWidth(2);
-            setStroke(väri);
-            canvas.strokePolygon(new double[]{piste1.x, piste2.x, piste3.x},
-            new double[]{piste1.y, piste2.y, piste3.y}, 3);
-    }
-        
-    }
+      Point keski = new Point(100, 100);
+      Kuvio test1 = new Kuvio(3,keski,CoreColor.Red,true);
+      KuvioPari test2 = new KuvioPari(3,4,keski,CoreColor.Red,CoreColor.Red,true,true);
+      KuvioPari test3 = new KuvioPari(3,3,keski,CoreColor.Red,CoreColor.Red,true,true);
+      Kuvio test4 = new Kuvio(4,keski,CoreColor.Red,true);
+      KuvioPari test5 = new KuvioPari(4,0,keski,CoreColor.Red,CoreColor.Red,true,true);
+      KuvioPari test6 = new KuvioPari(4,4,keski,CoreColor.Red,CoreColor.Red,true,true);
+      Kuvio test7 = new Kuvio(0,keski,CoreColor.Red,true);
+      KuvioPari test8 = new KuvioPari(0,4,keski,CoreColor.Red,CoreColor.Red,true,true);
+      KuvioPari test9 = new KuvioPari(0,0,keski,CoreColor.Red,CoreColor.Red,true,true);
+      test2.vertaile(test1);
+      test2.vertaile(test2);
+      test2.vertaile(test3);
+      test3.vertaile(test4);
+      test4.vertaile(test5);
+      test5.vertaile(test6);
+      test6.vertaile(test7);
+      test7.vertaile(test8);
+      test8.vertaile(test9);
+      
+''Ensimmäinen kuvio on isompi.
+  Kuviot ovat yhtä suuret
+  Toinen kuvio on isompi.
+  Toinen kuvio on isompi.
+  Toinen kuvio on isompi.
+  Toinen kuvio on isompi.
+  Toinen kuvio on isompi.
+  Toinen kuvio on isompi.
+  Toinen kuvio on isompi.''
 \end{javacode}
 
 \section{b-kohta}
 \label{b-kohta}
-Perusasetelman kuviot saadaan aikaan sijoittamalla piirrä-metodit piirtelypinann
-drawforegroundin sisään.
+Kuvio voi olla vain ympurä, neliö tai kolmio, sillä konstruktori varmistaa
+kulmamäärän heti alussa ja katkaisee koodin toiminnan jos lukema ei täsmää.
 \begin{javacode}
-    protected void drawForegroundContent(GraphicsContext canvas) {
-        {
-            Point keski = new Point(100, 100);
-            double koko = 32;
-            piirräLaatikko(keski, koko, CoreColor.Red, true, canvas);
-        }
-        {
-            Point keski = new Point(300, 150);
-            double koko = 80;
-            piirräKolmio(keski, CoreColor.Green, true, koko, canvas);
-        }
-        {
-            Point keski = new Point(150, 350);
-            int koko = 80; 
-            piirräPallukka(keski, CoreColor.Yellow, koko, true, canvas);
-        }
+    if (kulmaMaara != 0 && kulmaMaara != 3 && kulmaMaara != 4) {
+      System.out.println("Kuvio ei ole ympyrä, neliö tai kolmio!");
+      return;
     }
 \end{javacode}
 
 \section{c-kohta}
 \label{c-kohta}
-Asetelma laittaa sisäkkäiset kuviot, joista sisempi on puolet pienempi ennalta
-määrättyihin sijainteihin. Kunkin kuvion lokaatio määritellään randomilla,
-hyväksikäyttäe switchia, varmistaen ettei sama ole missään kahdesti.
-
-\begin{javacode}
-Random num = new Random();
-      int x = 0;
-      int y = 0;
-      double koko = 30;
-      int kohta = num.nextInt(9);
-      ArrayList käytetyt = new ArrayList();
-      CoreColor color = CoreColor.Red;
-      for (int i = 0; i<3;i++) {
-        x = x + 50;
-        for (int j = 0; j<3;j++) {
-          y = y + 50;
-          Point p = new Point(x,y);
-          while (käytetyt.contains(kohta)) {
-            kohta = num.nextInt(9);
-          }
-          käytetyt.add(kohta);
-          switch(kohta){
-          case 0: piirräKolmio(p, color, false, koko, canvas);
-          piirräKolmio(p, color, true, koko/2, canvas);
-          break;
-          case 1: piirräKolmio(p, color, false, koko, canvas);
-          piirräPallukka(p, color, koko/2, true, canvas);
-          break;
-          case 2: piirräKolmio(p, color, false, koko, canvas);
-          piirräLaatikko(p, koko/2, color, true, canvas);
-          break;
-          case 3: piirräPallukka(p, color, koko, false, canvas);
-          piirräKolmio(p, color, true, koko/2, canvas);
-          break;
-          case 4: piirräPallukka(p, color, koko, false, canvas);
-          piirräPallukka(p, color, koko/2, true, canvas);
-          break;
-          case 5: piirräPallukka(p, color, koko, false, canvas);
-          piirräLaatikko(p, koko/2, color, true, canvas);
-          break;
-          case 6: piirräLaatikko(p, koko, color, false, canvas);
-          piirräKolmio(p, color, true, koko/2, canvas);
-          break;
-          case 7: piirräLaatikko(p, koko, color, false, canvas);
-          piirräPallukka(p, color, koko/2, true, canvas);
-          break;
-          case 8: piirräLaatikko(p, koko, color, false, canvas);
-          piirräLaatikko(p, koko/2, color, true, canvas);
-          break;
-        }
-        }
-        y = 0;
-      }
-\end{javacode}
-Ratkaisussa ei tarvinnut käyttää periytymistä aiempia enempää, joskin
-PiirtelyPinta, jolla kuviot piirretään perii luokan SimpleCanvas.
+Kaikki luokat toimivat ArrayListissa, HashMapissa ja TreeMapissa, niin kauan kun tiesi
+joko objektin indexin listassa tai avaimen jolla sen sai haettua, sillä silloin ne sai
+ulos alkuperäisessä muodossaan ja pystyi castaamaan tarvittaessa. HashSetissä ja
+TreeSetissä, ei objekteja saanut palautettua samalla tavalla, joten mikään ei toiminut.
 
 \section{d-kohta}
 \label{d-kohta}
-Yksi tapa ratkaista tilanne on luoda uudet metodit KolmioNeliö ja
-Neliökolmio yms ja laittaa ne kutsumaan jo olemassaolevia metodeja,
-jolloin voidaan hyväksikäyttää jo olemassaolevia materiaaleja.
-esim.
+Luokassa Tallennettava on kaksi Serializable arvoa jotka tallennetaan, ja yksi transient
+arvo jota ei tallenneta, mainissa oleva tallennusmetodi ajettaessa syntyi tallennus.tal
+tiedosto.
 \begin{javacode}
-KolmioNeliö(Point p, double koko, Color color1, Color color2, boolean
-filled1, boolean filled2, GraphicsContext canvas)
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class Main {
+  public static void main(String[] args) {
+    Tallennettava t = new Tallennettava();
+    try {
+      FileOutputStream tiedosto = new FileOutputStream("tallennus.tal");
+      ObjectOutputStream tallenna = new ObjectOutputStream(tiedosto);
+      tallenna.writeObject(t);
+      tallenna.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
+}
+class Tallennettava implements Serializable{
+  private static final long serialVersionUID = 1L;
+  int arvo1 = 24;
+  transient int arvo2 = 10;
+  int arvo3 = 12;
+}
 \end{javacode}
-Elegantimpi ratkaisu olisi uudenmallinen metodi, kenties jo olemassaolevista
-muokattu tai uusi, piirräMuoto, joka ottaisi vastaan halutun muodon (tyypit tulisi
-olla määritetty etukäteen), kaikki muodolle tarpeelliset tiedot ja myös mahdollisen
-sisämuodon tiedot, jotka nulleiksi jätettyinä tarkoittaisivat ettei sisämuotoa tule.
+
 
 Tekijänä Tommi Heikkinen (517749)
