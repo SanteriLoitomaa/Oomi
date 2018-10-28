@@ -68,7 +68,8 @@ Ja visuaalisen kuvauksen tein omana metodinaan joka piirtää taulukon SimpleCan
             	for (int i=0;i<h.list.size();i++) {
            			for(int j=0;j<h.list.get(i).length;j++) {
            				if(h.list.get(i)[j] != null) {
-           					gc.setFill(((CoreColor)(h.list.get(i)[j])).toFXColor());
+           					gc.setFill(((CoreColor)(h.list.get(i)[j]))
+                                                                  .toFXColor());
             				gc.fillRect(i*60+100,j*60+100,60,60);
            				}else {
         					gc.setFill(Color.WHITE);

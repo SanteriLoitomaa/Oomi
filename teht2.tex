@@ -17,7 +17,6 @@ public class Kuvio{
     NELIÖ, YMPYRÄ, KOLMIO
   }
   Tyyppi tyyppi;
-  
   /**
    * 
    * Luo uuden kuvio olion, katkaisten luonnin jos kulmaMaara ei täsmää kuvioihin.
@@ -46,9 +45,7 @@ public class Kuvio{
       this.koko = 60;
     }
   }
-  
 }
-
 \end{javacode}
 Kuviolla on etukäteen määritetty koko, jotta tehtävä täyttäisi suuruusjärjestykseen
 liittyvät ehdot.
@@ -66,7 +63,6 @@ public class KuvioPari extends Kuvio{
     NELIÖ, YMPYRÄ, KOLMIO
   }
   Tyyppi sisaTyyppi;
-  
   /**
    * 
    * Luo uuden kuviopari olion, katkaisten luonnin jos kulmaMaara ei täsmää kuvioihin.
@@ -135,7 +131,6 @@ joka laskee kuvioiden pinta-alan ja määrittelee siten mikä on suurin.
     if (kuvio.tyyppi == Tyyppi.NELIÖ) {
       suuruus2 = kuvio.koko*kuvio.koko;
     }
-    
     if (suuruus1 < suuruus2) {
       System.out.println("Toinen kuvio on isompi.");
     } else if(suuruus1 > suuruus2) {
@@ -144,7 +139,6 @@ joka laskee kuvioiden pinta-alan ja määrittelee siten mikä on suurin.
       System.out.println("Kuviot ovat yhtä suuret");
     }
   }
-  
 \end{javacode}
 
 Lopuksi testasin vertailun toimivuutta luomalla kuviot testi1-9 jotka ovat kukin
@@ -175,7 +169,6 @@ Alla kutsupino ja sitten tulostus
       test6.vertaile(test7);
       test7.vertaile(test8);
       test8.vertaile(test9);
-      
 ''Ensimmäinen kuvio on isompi.
   Kuviot ovat yhtä suuret
   Toinen kuvio on isompi.
@@ -215,7 +208,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
 public class Main {
   public static void main(String[] args) {
     Tallennettava t = new Tallennettava();
@@ -228,7 +220,6 @@ public class Main {
       e.printStackTrace();
     }
   }
-  
 }
 class Tallennettava implements Serializable{
   private static final long serialVersionUID = 1L;
