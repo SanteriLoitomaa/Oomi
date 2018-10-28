@@ -1,216 +1,196 @@
 
 \chapter{Tehtävä 4 \label{chap:Teht=0000E4v=0000E4-4}}
 
-Tehtävän tarkoituksena oli demostroida javan metodikutsurakenteen toimintaaa ja mahdollisia rajoitteita.
-Tehtävässä on luotu maailma jossa on Hiiri, Kissa ja Hipsteri olioita. Kun kaksi oliota tapaavat tulostuu näytölle testi joka määräytyy olioiden luokan mukaan.
+Tehtävänä oli luoda geneerinen Hajautustaulu ja Linkitetty lista ja kuvata niiden toimintaa visuaalisesti 
+OOMKitillä. 
 
-\section{Kuormitus(a)}
+\section{Hajautustaulu}
 
-\label{Kuormitus}
+\label{Hajautustaulu}
 
-Loin jokaiselle mahdolliselle olion yhdistelmälle kohtaa-metodin. 
-Kaikilla metodeilla on täysin sama nimi ja vain parametrit muuttuvat.
-
-\label{Olio-luokat}
+Hajautustaulu on luotu olio taulukko ArrayListina.(java ei anna tehdä geneerisiä taulukoita). 
+Jossa samanlaiset oliot tallennetaan samalle sarakeelle. 
+\label{Hajautustaulu}
 \begin{javacode}
-public class Hipsteri extends Olio {
-	public Hipsteri() {}
-	
-	public void kohtaa(Hipsteri h) {
-		System.out.println("Hipsteri kohtaa hipsterin");
-	}
-    public void kohtaa(Kissa k) {
-    	System.out.println("Hipsteri kohtaa eläimen");
-	}
-    public void kohtaa(Hiiri h) {
-    	System.out.println("Hipsteri kohtaa eläimen");
-	}
-}
-public class Kissa extends Olio{
-	public Kissa() {}
-	
-	public void kohtaa(Hipsteri h) {
-		System.out.println("Hipsteri kohtaa eläimen");
-	}
-	public void kohtaa(Kissa k) {
-		System.out.println("Kissoja syntyy mahdollisesti nyt");
-	}
-	public void kohtaa(Hiiri h) {
-		System.out.println("Hiiri syödään");
-	}
-}
-public class Hiiri extends Olio {
-	public Hiiri() {}
-	
-	public void kohtaa(Hipsteri h) {
-		System.out.println("Hipsteri kohtaa eläimen");
-	}
-	public void kohtaa(Hiiri h) {
-		System.out.println("Hiiriä syntyy mahdollisesti nyt");
-	}
-	public void kohtaa(Kissa k) {
-		System.out.println("Hiiri syödään");
-	}
-}
-\end{javacode}
-Ja sitten yksin kertainen tarkistus että koodi toimii niin kuin ajattelin.
+import java.util.ArrayList;
 
-\label{Koodin testaus}
-\begin{javacode}
-public static void main(String[]args) {
-    	Hipsteri harri = new Hipsteri();
-    	Hipsteri tiina = new Hipsteri();
-    	Hiiri pip = new Hiiri();
-    	Kissa misu = new Kissa();
-    	harri.kohtaa(misu);
-    	pip.kohtaa(harri);
-    	misu.kohtaa(pip);
-    	tiina.kohtaa(harri);
-      }
+
+public class Hajautustaulu<E> {
+	ArrayList<Object[]> list = new ArrayList<Object[]>();
+	
+	public Hajautustaulu() {
+		 
+	}
+	public boolean lisää(E arvo) {
+		for (Object[] taulu : list) {
+			if(taulu[0].equals(arvo)) {
+				for(int i=1;i<taulu.length;i++) {
+					if(taulu[i] == null) {
+						taulu[i]=arvo;
+						return true;
+					}else {
+						return false;
+					}
+				}
+			}
+		}
+		Object[] t = {arvo,null,null};
+		list.add(t);
+		return true;
+		
+	}
+	public boolean poista(E arvo) {
+		for(Object[] taulu : list) {
+			if(taulu[0].equals(arvo)) {
+				for(int i=0;i<taulu.length;i++) {
+					if(taulu[i+1] == null) {
+						taulu[i]=null;
+						if(i == 0) {
+							list.remove(taulu);
+						}
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+}
+
 \end{javacode}
 
-\section{Yliluokan käyttö(b)}
+Ja visuaalisen kuvauksen tein omana metodinaan joka piirtää taulukon SimpleCanvasiin. 
 
-\label{Yliluokan käyttö}
- Seuraavaksi laitoin olioita taulukkoon ja valitsin kahdesta taulukon indeksista olion ja laitoin ne kohtaamaan.
+\begin{javacode}
+ public void piirräHajautustaulu(GraphicsContext gc,Hajautustaulu<CoreColor> h) {
+            	for (int i=0;i<h.list.size();i++) {
+           			for(int j=0;j<h.list.get(i).length;j++) {
+           				if(h.list.get(i)[j] != null) {
+           					gc.setFill(((CoreColor)(h.list.get(i)[j])).toFXColor());
+            				gc.fillRect(i*60+100,j*60+100,60,60);
+           				}else {
+        					gc.setFill(Color.WHITE);
+        					gc.fillRect(i*60+100,j*60+100, 60, 60);
+        				}
+        				gc.strokeRect(i*60+100,j*60+100,60,60);
+        			}
+        		}
+           	}
+
+\end{javacode}
+
+Kuva miltä hajautustaulu näyttäisi.
+
+
+
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/Hajautustaulu}
+\label{Hajautustaulu} 
+\end{figure}
+
+
+
+\section{Linkitetty lista}
+
+\label{Linkitetty lista}
+ Toinen tehtävän osa oli linkitetty lista, joka oli mielästäni paljon helpompi toteutaa. Tein perus yksisuuntaisen linkitetyn listan 
+ jossa alkio tietää oman arvonsa ja mitä tulee sen jälkeen.
  \begin{javacode}
-public class Maailma {
-	public Olio[] map;
+ 
+ public class LinkitettyLista<E> {
+	E arvo;
+	LinkitettyLista<E> seuraava;
 	
-    public Maailma() {
-    	map = new Olio[10];
-    }
-    public void lisää(Olio o,int i) {
-    	map[i]=o;
-    }
-    public void poista(int i) {
-    	map[i]=null;
-    }
-    public Olio get(int i) {
-    	return map[i];
-    }
-     public static void main(String[]args) {
-    	
-    	Maailma m = new Maailma();
-    	Hipsteri harri = new Hipsteri();
-    	Hipsteri tiina = new Hipsteri();
-    	Hiiri pip = new Hiiri();
-    	Hiiri pup = new Hiiri();
-    	Kissa misu = new Kissa();
-    	Kissa kisu = new Kissa();
-    	
-    	m.lisää(harri, 0);
-    	m.lisää(tiina, 1);
-    	m.lisää(pip, 2);
-    	m.lisää(misu, 3);
-    	m.lisää(pup, 4);
-    	m.lisää(kisu, 5);
-  
-    	m.get(0).kohtaa(m.get(1));
-    	m.get(0).kohtaa(m.get(2));
-    	m.get(0).kohtaa(m.get(3));
-    	m.get(2).kohtaa(m.get(4));
-    	m.get(2).kohtaa(m.get(3));
-    	m.get(3).kohtaa(m.get(3));
-    	m.get(3).kohtaa(m.get(1));
-    }
+	public LinkitettyLista(E arvo) {
+		this.arvo = arvo;
+		seuraava = null;
+	}
+	
+	public void lisää(E arvo) {
+		E tempt = this.arvo;
+			if(seuraava != null) {
+				tempt = seuraava.arvo;
+				seuraava.lisää(arvo);			}
+			else {
+				seuraava = new LinkitettyLista<E>(arvo);
+		}
+	}
+		
+				
+	
+	public boolean poista(E arvo) {
+		LinkitettyLista<E> edellinen = null;
+		LinkitettyLista<E> temp = this;
+		do {
+			if(temp.arvo.equals(arvo)) {
+				if(edellinen != null) {
+					if(temp.seuraava != null) {
+						edellinen.seuraava = temp.seuraava;
+						return true;
+					}else {
+						edellinen.seuraava = null;
+						return true;
+					}
+				}
+			}
+			edellinen = temp;
+			temp = edellinen.seuraava;
+		}
+		while(temp.seuraava != null);
+		return false;
+	}
+	public void tulosta() {
+		LinkitettyLista solmu = this;
+		System.out.println(solmu.arvo.toString());
+		
+		while(solmu.seuraava != null) {
+			solmu = solmu.seuraava;
+			System.out.println(solmu.arvo.toString());
+		}
+	}
+}
     
 \end{javacode}
 
-Tässä tilanteessa kohtaa-metodit eivät toimi sellaisenaan sillä parametri on
-olio-tyyppisenä. Tässä tilanteessa voitaisiin dynaamisesti muuttaa parametrin tyyppiä, mutta
-tämä toimii vain jos parametrin tyyppi on ennestään tiedossa. Itse tekisin yläluokkaan yhden metodin joka tarkistaa molempien 
-olioden tyypit. 
+Linkitetylle listalle on myös sen oma piirtämismetodi. Linkitetty lista piirretään ainasamaan kohtaan ja sen lopuun tulee 
+musta neliö. 
 
 \begin{javacode}
-public void kohtaa(Olio o) {
-		if(this instanceof Kissa) {
-			if(o instanceof Kissa) {
-				System.out.println("Kissoja syntyy mahdollisesti nyt");
-			}else if(o instanceof Hiiri) {
-				System.out.println("Kissa syö hiiren");
-		}else if(o instanceof Hipsteri) {
-			System.out.println("Hipsteri kohtaa eläimen");
-	    }
-	} if(this instanceof Hiiri) {
-		if(o instanceof Kissa) {
-			System.out.println("Kissa syö hiiren");
-		}else if(o instanceof Hiiri) {
-			System.out.println("Hiiriä syntyy mahdollisesti nyt");
-	}else if(o instanceof Hipsteri) {
-		System.out.println("Hipsteri kohtaa eläimen");
-}
-	} if(this instanceof Hipsteri) {
-		if(o instanceof Hipsteri) {
-			System.out.println("Hipsteri kohtaa hipsterin");
-		}else {
-			System.out.println("Hipsteri kohtaa eläimen");
-		}
-		
-		}
-}
+
+public void piirräLinkitettyLista(GraphicsContext gc,LinkitettyLista<CoreColor> lista) {
+            	LinkitettyLista solmu = lista;
+            	int x = 100;
+                int y = 100;
+        		//System.out.println(solmu.arvo.toString());
+            	gc.setFill(((CoreColor)(solmu.arvo)).toFXColor());
+            	gc.fillRect(x, y, 60, 60);
+            	gc.strokeRect(x,y,60,60);
+            	x = x+60;
+        		
+        		while(solmu.seuraava != null) {
+        			solmu = solmu.seuraava;
+        			gc.setFill(((CoreColor)(solmu.arvo)).toFXColor());
+                	gc.fillRect(x, y, 60, 60);
+                	gc.strokeRect(x,y,60,60);
+                	x = x+60;
+        		}
+        		gc.setFill(Color.BLACK);
+            	gc.fillRect(x, y, 60, 60);
+            	gc.strokeRect(x,y,60,60);
+            	
+            }
+	    
+	    
 \end{javacode}
+Kuva miltä linkitetty lista näyttää OOMKitillä.
 
 
-
-\section{Vierailija(c)}
-\label{Vierailija}
-\begin{javacode}
-interface Visitor{
-	void visit(Kissa k,Olio o);
-	void visit(Hiiri h,Olio o);
-	void visit(Hipsteri h,Olio o);
-	
-}
-
-public class OlioVisitor implements Visitor {
-
-	@Override
-	public void visit(Kissa k, Olio o) {
-			if(o instanceof Kissa) {
-				System.out.println("Kissoja syntyy mahdollisesti nyt");
-			}else if(o instanceof Hiiri) {
-				System.out.println("Kissa syö hiiren");
-		}else if(o instanceof Hipsteri) {
-			System.out.println("Hipsteri kohtaa eläimen");
-	    }
-	}
-
-	@Override
-	public void visit(Hiiri h, Olio o) {
-		if(o instanceof Kissa) {
-			System.out.println("Kissa syö hiiren");
-		}else if(o instanceof Hiiri) {
-			System.out.println("Hiiriä syntyy mahdollisesti nyt");
-	}else if(o instanceof Hipsteri) {
-		System.out.println("Hipsteri kohtaa eläimen");
-    }
-		
-	}
-
-	@Override
-	public void visit(Hipsteri h, Olio o) {
-		if(o instanceof Kissa) {
-			System.out.println("Hipsteri kohtaa eläimen");
-		}else if(o instanceof Hiiri) {
-			System.out.println("Hipsteri kohtaa eläimen");
-	}else if(o instanceof Hipsteri) {
-		System.out.println("Hipsteri kohtaa hipsterin");
-    }
-		
-	}
-
-}
-
-
-\end{javacode}
-ja jokaiselle oliolle vastaanottaja metodi
-\begin{javacode}
-public void Accept(OlioVisitor visitor,Olio o) {
-    	visitor.visit(this,o); 
-    	} 
-	
-\end{javacode}
+\begin{figure}
+\centering \includegraphics[width=0.5\textwidth]{kuvat/LinkitettyLista}
+\label{LinkitettyLista} 
+\end{figure}
 
 
 
